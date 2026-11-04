@@ -1,0 +1,133 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_.-]+$');
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        ('email' in request.auth.token && request.auth.token.email == 'newshuntexpress@gmail.com') ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN')
+      );
+    }
+
+    function isSupervisor() {
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/supervisors/$(request.auth.uid)) ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'SUPERVISOR')
+      );
+    }
+
+    function canManageCamp() {
+      return isAdmin() || isSupervisor();
+    }
+
+    function isValidUser(data) {
+      return data.userId is string && data.userId.size() <= 128 &&
+             data.email is string && data.email.size() <= 200 &&
+             data.role in ['ADMIN', 'SUPERVISOR', 'VIEW_ONLY'] &&
+             (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 200));
+    }
+
+    function isValidAdminMarker(data) {
+      return data.userId is string && data.userId.size() <= 128 &&
+             (!('email' in data) || (data.email is string && data.email.size() <= 200));
+    }
+
+    function isValidRoom(data) {
+      return data.roomNumber is string && data.roomNumber.size() >= 1 && data.roomNumber.size() <= 32 &&
+             data.block is string && data.block.size() >= 1 && data.block.size() <= 64 &&
+             data.capacity is int && data.capacity == 2 &&
+             (!('note' in data) || (data.note is string && data.note.size() <= 500));
+    }
+
+    function isValidEmployee(data) {
+      return data.name is string && data.name.size() >= 1 && data.name.size() <= 200 &&
+             data.iqamaNumber is string && data.iqamaNumber.size() >= 1 && data.iqamaNumber.size() <= 64 &&
+             data.cardNumber is string && data.cardNumber.size() >= 1 && data.cardNumber.size() <= 64 &&
+             data.status in ['ACTIVE', 'ON_VACATION', 'CHECKED_OUT'] &&
+             (!('roomNumber' in data) || data.roomNumber == null || (data.roomNumber is string && data.roomNumber.size() <= 32)) &&
+             (!('bedNumber' in data) || data.bedNumber == null || (data.bedNumber is int && (data.bedNumber == 1 || data.bedNumber == 2))) &&
+             (!('dateIn' in data) || (data.dateIn is string && data.dateIn.size() <= 32)) &&
+             (!('dateOut' in data) || data.dateOut == null || (data.dateOut is string && data.dateOut.size() <= 32)) &&
+             (!('iqamaExpiryDate' in data) || (data.iqamaExpiryDate is string && data.iqamaExpiryDate.size() <= 32)) &&
+             (!('trade' in data) || (data.trade is string && data.trade.size() <= 100)) &&
+             (!('company' in data) || (data.company is string && data.company.size() <= 100)) &&
+             (!('phone' in data) || (data.phone is string && data.phone.size() <= 50)) &&
+             (!('nationality' in data) || (data.nationality is string && data.nationality.size() <= 100)) &&
+             (!('notes' in data) || (data.notes is string && data.notes.size() <= 1000));
+    }
+
+    // --- Users Collection ---
+    match /users/{userId} {
+      allow get, list: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(userId) && (
+        isAdmin() ||
+        request.auth.uid == userId
+      );
+      allow delete: if isAdmin() && isValidId(userId);
+    }
+
+    // --- Admins Collection ---
+    match /admins/{userId} {
+      allow get, list: if isSignedIn();
+      allow create, update: if (isAdmin() || (isSignedIn() && request.auth.uid == userId)) && isValidId(userId);
+      allow delete: if (isAdmin() || (isSignedIn() && request.auth.uid == userId)) && isValidId(userId);
+    }
+
+    // --- Supervisors Collection ---
+    match /supervisors/{userId} {
+      allow get, list: if isSignedIn();
+      allow create, update: if (isAdmin() || (isSignedIn() && request.auth.uid == userId)) && isValidId(userId);
+      allow delete: if (isAdmin() || (isSignedIn() && request.auth.uid == userId)) && isValidId(userId);
+    }
+
+    // --- Camp Rooms Collection (ADMIN & SUPERVISOR CAN CREATE, EDIT, CHANGE, DELETE) ---
+    match /rooms/{roomId} {
+      allow get, list: if isSignedIn();
+      allow create, update: if canManageCamp() && isValidId(roomId) && isValidRoom(incoming());
+      allow delete: if canManageCamp() && isValidId(roomId);
+    }
+
+    // --- Camp Employees Collection (ADMIN & SUPERVISOR CAN CREATE, EDIT, CHANGE, DELETE) ---
+    match /employees/{employeeId} {
+      allow get, list: if isSignedIn();
+      allow create, update: if canManageCamp() && isValidId(employeeId) && isValidEmployee(incoming());
+      allow delete: if canManageCamp() && isValidId(employeeId);
+    }
+
+    // --- System Updates & App Version Info (Readable by all signed in users, writable by Admin) ---
+    match /system_updates/{docId} {
+      allow get, list: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /app_metadata/{docId} {
+      allow get, list: if isSignedIn();
+      allow write: if isAdmin();
+    }
+  }
+}

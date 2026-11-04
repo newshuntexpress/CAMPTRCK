@@ -1,0 +1,8 @@
+{
+  "name": "CampTrack",
+  "description": "AWAZEL CO. camp employee accommodation management with 2-bed room allotments, Iqama tracking, and real-time room availability.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

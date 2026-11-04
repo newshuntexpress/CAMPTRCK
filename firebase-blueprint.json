@@ -1,0 +1,178 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with role-based access for CampTrack AWAZEL CO. system",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Unique Firebase Authentication UID of the user"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "User email address"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User full name or display name"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["ADMIN", "VIEW_ONLY"],
+          "description": "Authorization level: ADMIN (Full authorization) or VIEW_ONLY (View only)"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Document creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Document update timestamp"
+        }
+      },
+      "required": ["userId", "email", "role", "createdAt"]
+    },
+    "AdminMarker": {
+      "title": "AdminMarker",
+      "description": "Marker document in admins collection for zero-cost rules check",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "User UID who has administrative authorization"
+        },
+        "email": {
+          "type": "string",
+          "description": "Admin email address"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when admin status was granted"
+        }
+      },
+      "required": ["userId", "createdAt"]
+    },
+    "CampRoom": {
+      "title": "CampRoom",
+      "description": "Camp room accommodation unit with 2-bed capacity",
+      "type": "object",
+      "properties": {
+        "roomNumber": {
+          "type": "string",
+          "description": "Room identifier, e.g., A-1, A-2, B-1, B-2"
+        },
+        "block": {
+          "type": "string",
+          "description": "Camp block, e.g., Block A, Block B, Block C, Block D"
+        },
+        "capacity": {
+          "type": "integer",
+          "description": "Maximum bed capacity, strictly 2 beds per room"
+        },
+        "note": {
+          "type": "string",
+          "description": "Optional notes or maintenance remarks for the room"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update timestamp"
+        }
+      },
+      "required": ["roomNumber", "block", "capacity"]
+    },
+    "Employee": {
+      "title": "Employee",
+      "description": "Camp resident employee allotment and residency record",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Full name of the employee"
+        },
+        "iqamaNumber": {
+          "type": "string",
+          "description": "National/Iqama ID number"
+        },
+        "cardNumber": {
+          "type": "string",
+          "description": "Company employee/access card number"
+        },
+        "roomNumber": {
+          "type": "string",
+          "description": "Assigned room number or empty/omitted if checked out"
+        },
+        "bedNumber": {
+          "type": "integer",
+          "description": "Assigned bed number (1 for Bed 1, 2 for Bed 2) or omitted if checked out"
+        },
+        "dateIn": {
+          "type": "string",
+          "description": "Check-in date (YYYY-MM-DD)"
+        },
+        "dateOut": {
+          "type": "string",
+          "description": "Check-out date (YYYY-MM-DD) if checked out"
+        },
+        "iqamaExpiryDate": {
+          "type": "string",
+          "description": "Iqama expiration date (YYYY-MM-DD)"
+        },
+        "trade": {
+          "type": "string",
+          "description": "Job designation / trade (e.g. Electrician, Driver)"
+        },
+        "company": {
+          "type": "string",
+          "description": "Company name, defaulting to AWAZEL CO."
+        },
+        "phone": {
+          "type": "string",
+          "description": "Contact phone number"
+        },
+        "nationality": {
+          "type": "string",
+          "description": "Resident nationality"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["ACTIVE", "ON_VACATION", "CHECKED_OUT"],
+          "description": "Resident status: ACTIVE, ON_VACATION, or CHECKED_OUT"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional remarks or room inspection comments"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last modification timestamp"
+        }
+      },
+      "required": ["name", "iqamaNumber", "cardNumber", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Collection of system user profiles with authorization roles"
+    },
+    "/admins/{userId}": {
+      "schema": "AdminMarker",
+      "description": "Collection of admin marker documents for role checking"
+    },
+    "/rooms/{roomId}": {
+      "schema": "CampRoom",
+      "description": "Collection of accommodation rooms"
+    },
+    "/employees/{employeeId}": {
+      "schema": "Employee",
+      "description": "Collection of resident employees and allotments"
+    }
+  }
+}
