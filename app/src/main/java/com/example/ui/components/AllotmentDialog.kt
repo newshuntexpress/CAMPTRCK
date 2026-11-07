@@ -137,7 +137,7 @@ fun AllotmentDialog(
         mutableStateOf(activeLinkedEmployee?.dateIn?.ifEmpty { null } ?: CampViewModel.getCurrentDateString())
     }
     var trade by remember(activeLinkedEmployee) {
-        mutableStateOf(activeLinkedEmployee?.trade?.ifEmpty { null } ?: "Electrician")
+        mutableStateOf(activeLinkedEmployee?.trade?.ifEmpty { null } ?: "")
     }
     var company by remember(activeLinkedEmployee) {
         mutableStateOf(activeLinkedEmployee?.company?.ifEmpty { null } ?: "AWAZEL CO.")
@@ -384,7 +384,7 @@ fun AllotmentDialog(
                     OutlinedTextField(
                         value = if (selectedRoomObj != null) {
                             "Room ${selectedRoomObj.room.roomNumber} - ${selectedRoomObj.room.block} (${selectedRoomObj.availableBeds} bed free)"
-                        } else "No vacant room available",
+                        } else "No empty room available",
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Room No. Allotment *") },
@@ -415,7 +415,7 @@ fun AllotmentDialog(
                                                 fontWeight = FontWeight.SemiBold
                                             )
                                             Text(
-                                                text = "${r.availableBeds} bed free • Bed 1: ${if (r.bed1Occupant == null) "Open" else "Occupied"} • Bed 2: ${if (r.bed2Occupant == null) "Open" else "Occupied"}",
+                                                text = "${r.availableBeds} bed free • Bed 1: ${if (r.bed1Occupant == null) "Open" else "Booked"} • Bed 2: ${if (r.bed2Occupant == null) "Open" else "Booked"}",
                                                 style = MaterialTheme.typography.bodySmall,
                                                 color = Green500
                                             )
@@ -474,7 +474,7 @@ fun AllotmentDialog(
                                         fontSize = 13.sp
                                     )
                                     Text(
-                                        text = if (bed1Available) "Available" else "Occupied (${selectedRoomObj?.bed1Occupant?.name?.take(8)}...)",
+                                        text = if (bed1Available) "Available" else "Booked (${selectedRoomObj?.bed1Occupant?.name?.take(8)}...)",
                                         style = MaterialTheme.typography.labelSmall,
                                         fontSize = 10.sp,
                                         color = if (bed1Available) Green500 else MaterialTheme.colorScheme.error
@@ -511,7 +511,7 @@ fun AllotmentDialog(
                                         fontSize = 13.sp
                                     )
                                     Text(
-                                        text = if (bed2Available) "Available" else "Occupied (${selectedRoomObj?.bed2Occupant?.name?.take(8)}...)",
+                                        text = if (bed2Available) "Available" else "Booked (${selectedRoomObj?.bed2Occupant?.name?.take(8)}...)",
                                         style = MaterialTheme.typography.labelSmall,
                                         fontSize = 10.sp,
                                         color = if (bed2Available) Green500 else MaterialTheme.colorScheme.error
@@ -645,7 +645,7 @@ fun AllotmentDialog(
                     }
                     val isBedTaken = if (selectedBedNumber == 1) !bed1Available else !bed2Available
                     if (isBedTaken) {
-                        validationError = "Bed $selectedBedNumber is already occupied. Please select an available bed."
+                        validationError = "Bed $selectedBedNumber is already booked. Please select an available bed."
                         return@Button
                     }
 

@@ -9,6 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -191,9 +192,10 @@ fun MainAppContent(initialDeepLink: Uri? = null) {
 
     // Public Employee Self-Registration Dialog (No login required)
     if (showPublicSelfRegistration) {
+        val publicRooms by repository.roomsWithOccupantsFlow.collectAsState(initial = emptyList())
         EmployeeSelfRegistrationDialog(
             onDismiss = { showPublicSelfRegistration = false },
-            onSubmit = { name, iqama, card, trade, comp, dept, phone, nat, dateIn, notes, onComplete ->
+            onSubmit = { name, iqama, card, trade, comp, dept, phone, nat, dateIn, roomNumber, onComplete ->
                 coroutineScope.launch {
                     val result = repository.registerEmployeeSelfEntry(
                         name = name,
@@ -205,11 +207,13 @@ fun MainAppContent(initialDeepLink: Uri? = null) {
                         phone = phone,
                         nationality = nat,
                         dateIn = dateIn,
-                        notes = notes
+                        roomNumber = roomNumber,
+                        notes = ""
                     )
                     onComplete(result)
                 }
-            }
+            },
+            availableRooms = publicRooms.map { it.room.roomNumber }
         )
     }
 }

@@ -39,7 +39,7 @@ data class RoomWithOccupants(
         get() = when {
             isFull -> "Full (2/2)"
             isPartiallyOccupied -> "1 Bed Available"
-            else -> "Vacant (2 Beds)"
+            else -> "Empty (2 Beds)"
         }
 }
 

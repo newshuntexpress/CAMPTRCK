@@ -1,5 +1,6 @@
 package com.example
 
+import com.example.ui.components.compareRoomSequences
 import com.example.ui.viewmodel.CampUiState
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -46,5 +47,13 @@ class ExampleUnitTest {
     assertTrue("Allotment URL should contain empId", url.contains("empId=emp_123"))
     assertTrue("Allotment URL should contain iqama", url.contains("iqama=2489102341"))
     assertEquals("camptrack://register", com.example.util.QrCodeGenerator.REGISTRATION_DEEP_LINK)
+  }
+
+  @Test
+  fun testRoomNumberSequence() {
+    val unsorted = listOf("A-10", "B-2", "A-2", "B-10", "A-1", "B-1", "A-20", "C-5", "C-1")
+    val sorted = unsorted.sortedWith(::compareRoomSequences)
+    val expected = listOf("A-1", "A-2", "A-10", "A-20", "B-1", "B-2", "B-10", "C-1", "C-5")
+    assertEquals(expected, sorted)
   }
 }

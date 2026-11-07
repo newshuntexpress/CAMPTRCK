@@ -38,6 +38,7 @@ import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MeetingRoom
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Print
 import androidx.compose.material.icons.filled.Search
@@ -628,7 +629,7 @@ fun DashboardScreen(
                 tonalElevation = 6.dp
             ) {
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    // Navigation Bar (Tabs: Rooms & Beds, Employees, Camp Overview)
+                    // Navigation Bar (Tabs: Rooms, Employees, Overview, More)
                     NavigationBar(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -640,18 +641,22 @@ fun DashboardScreen(
                         NavigationBarItem(
                             selected = uiState.selectedTab == 0,
                             onClick = { viewModel.setSelectedTab(0) },
+                            alwaysShowLabel = true,
                             icon = {
                                 Icon(
                                     imageVector = if (uiState.selectedTab == 0) Icons.Default.MeetingRoom else Icons.Outlined.MeetingRoom,
                                     contentDescription = "Rooms & Beds",
-                                    modifier = Modifier.size(22.dp)
+                                    modifier = Modifier.size(20.dp)
                                 )
                             },
                             label = {
                                 Text(
-                                    text = "Rooms & Beds",
-                                    fontSize = 11.sp,
-                                    fontWeight = if (uiState.selectedTab == 0) FontWeight.Bold else FontWeight.Normal
+                                    text = "Rooms",
+                                    fontSize = 10.5.sp,
+                                    fontWeight = if (uiState.selectedTab == 0) FontWeight.Bold else FontWeight.Normal,
+                                    maxLines = 1,
+                                    softWrap = false,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             },
                             modifier = Modifier.testTag("nav_tab_rooms")
@@ -660,18 +665,22 @@ fun DashboardScreen(
                         NavigationBarItem(
                             selected = uiState.selectedTab == 1,
                             onClick = { viewModel.setSelectedTab(1) },
+                            alwaysShowLabel = true,
                             icon = {
                                 Icon(
                                     imageVector = if (uiState.selectedTab == 1) Icons.Default.Badge else Icons.Outlined.Badge,
                                     contentDescription = "Staff Roster",
-                                    modifier = Modifier.size(22.dp)
+                                    modifier = Modifier.size(20.dp)
                                 )
                             },
                             label = {
                                 Text(
                                     text = "Employees",
-                                    fontSize = 11.sp,
-                                    fontWeight = if (uiState.selectedTab == 1) FontWeight.Bold else FontWeight.Normal
+                                    fontSize = 10.5.sp,
+                                    fontWeight = if (uiState.selectedTab == 1) FontWeight.Bold else FontWeight.Normal,
+                                    maxLines = 1,
+                                    softWrap = false,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             },
                             modifier = Modifier.testTag("nav_tab_employees")
@@ -680,21 +689,49 @@ fun DashboardScreen(
                         NavigationBarItem(
                             selected = uiState.selectedTab == 2,
                             onClick = { viewModel.setSelectedTab(2) },
+                            alwaysShowLabel = true,
                             icon = {
                                 Icon(
                                     imageVector = if (uiState.selectedTab == 2) Icons.Default.Analytics else Icons.Outlined.Analytics,
                                     contentDescription = "Camp Overview",
-                                    modifier = Modifier.size(22.dp)
+                                    modifier = Modifier.size(20.dp)
                                 )
                             },
                             label = {
                                 Text(
                                     text = "Overview",
-                                    fontSize = 11.sp,
-                                    fontWeight = if (uiState.selectedTab == 2) FontWeight.Bold else FontWeight.Normal
+                                    fontSize = 10.5.sp,
+                                    fontWeight = if (uiState.selectedTab == 2) FontWeight.Bold else FontWeight.Normal,
+                                    maxLines = 1,
+                                    softWrap = false,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             },
                             modifier = Modifier.testTag("nav_tab_overview")
+                        )
+
+                        NavigationBarItem(
+                            selected = uiState.selectedTab == 3,
+                            onClick = { viewModel.setSelectedTab(3) },
+                            alwaysShowLabel = true,
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = "More Options",
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            },
+                            label = {
+                                Text(
+                                    text = "More",
+                                    fontSize = 10.5.sp,
+                                    fontWeight = if (uiState.selectedTab == 3) FontWeight.Bold else FontWeight.Normal,
+                                    maxLines = 1,
+                                    softWrap = false,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            },
+                            modifier = Modifier.testTag("nav_tab_more")
                         )
                     }
 
@@ -793,6 +830,16 @@ fun DashboardScreen(
                     onOpenReportClick = { viewModel.openDailyReportDialog() },
                     onOpenRegistrationQrClick = { viewModel.openRegistrationQrDialog() },
                     onDownloadApkClick = { viewModel.startDownloadAndInstallApk(context) }
+                )
+                3 -> MoreActionsTab(
+                    uiState = uiState,
+                    onOpenReportClick = { viewModel.openDailyReportDialog() },
+                    onOpenRegistrationQrClick = { viewModel.openRegistrationQrDialog() },
+                    onDownloadApkClick = { viewModel.startDownloadAndInstallApk(context) },
+                    onAddNewRoomClick = { viewModel.openAddRoomDialog() },
+                    onUploadEmployees = { uri, onComplete ->
+                        viewModel.bulkImportEmployees(context, uri, onComplete)
+                    }
                 )
             }
         }
@@ -1050,9 +1097,12 @@ fun DashboardScreen(
 
     // --- Employee Self-Registration Form Dialog ---
     if (uiState.showSelfRegistrationDialog) {
+        val availableRoomNumbers = remember(uiState.rooms) {
+            uiState.rooms.map { it.room.roomNumber }
+        }
         EmployeeSelfRegistrationDialog(
             onDismiss = { viewModel.closeSelfRegistrationDialog() },
-            onSubmit = { name, iqama, card, trade, comp, dept, phone, nat, dateIn, notes, onComplete ->
+            onSubmit = { name, iqama, card, trade, comp, dept, phone, nat, dateIn, roomNumber, onComplete ->
                 viewModel.submitEmployeeSelfRegistration(
                     name = name,
                     iqamaNumber = iqama,
@@ -1063,10 +1113,12 @@ fun DashboardScreen(
                     phone = phone,
                     nationality = nat,
                     dateIn = dateIn,
-                    notes = notes,
+                    roomNumber = roomNumber,
+                    notes = "",
                     onComplete = onComplete
                 )
-            }
+            },
+            availableRooms = availableRoomNumbers
         )
     }
 }

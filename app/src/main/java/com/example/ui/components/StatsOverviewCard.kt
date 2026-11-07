@@ -187,7 +187,7 @@ fun StatsOverviewCard(
                 )
 
                 MetricMiniItem(
-                    label = "Occupied Beds",
+                    label = "Booked Beds",
                     value = "${stats.occupiedBeds}/${stats.totalBeds}",
                     icon = Icons.Default.Bed,
                     color = Amber500,

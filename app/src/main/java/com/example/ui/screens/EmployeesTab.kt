@@ -142,89 +142,25 @@ fun EmployeesTab(
             .fillMaxSize()
             .padding(horizontal = 12.dp, vertical = 8.dp)
     ) {
-        // --- Header Section: Title, Stats & Bulk Import Actions ---
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        // --- Header Section: Title & Staff Count ---
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
         ) {
-            Column {
-                Text(
-                    text = "Staff Roster & Employees",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 17.sp,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = "${uiState.filteredEmployees.size} staff records found",
-                    style = MaterialTheme.typography.bodySmall,
-                    fontSize = 11.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            // Bulk Import, Sample Template & QR Buttons (Admins & Supervisors)
-            if (uiState.canManageCamp) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // QR Code for Employee Self-Registration
-                    OutlinedButton(
-                        onClick = onOpenRegistrationQrClick,
-                        shape = RoundedCornerShape(8.dp),
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                        modifier = Modifier.height(30.dp).testTag("employee_qr_code_button")
-                    ) {
-                        Icon(Icons.Default.QrCode, contentDescription = null, modifier = Modifier.size(14.dp))
-                        Spacer(modifier = Modifier.width(3.dp))
-                        Text("Self-Reg QR", fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                    }
-
-                    // Download Sample Template Button
-                    OutlinedButton(
-                        onClick = {
-                            showTemplateChoiceDialog = true
-                        },
-                        shape = RoundedCornerShape(8.dp),
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                        modifier = Modifier.height(30.dp).testTag("download_template_button")
-                    ) {
-                        Icon(Icons.Default.Download, contentDescription = null, modifier = Modifier.size(14.dp))
-                        Spacer(modifier = Modifier.width(3.dp))
-                        Text("Template", fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                    }
-
-                    // Upload Employees Button (replaces Bulk Import)
-                    Button(
-                        onClick = {
-                            filePickerLauncher.launch(
-                                arrayOf(
-                                    "text/csv",
-                                    "text/comma-separated-values",
-                                    "text/plain",
-                                    "application/vnd.ms-excel",
-                                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                                    "*/*"
-                                )
-                            )
-                        },
-                        enabled = !isUploading && !uiState.isLoading,
-                        shape = RoundedCornerShape(8.dp),
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                        modifier = Modifier.height(30.dp).testTag("upload_employees_button")
-                    ) {
-                        Icon(Icons.Default.UploadFile, contentDescription = null, modifier = Modifier.size(14.dp))
-                        Spacer(modifier = Modifier.width(3.dp))
-                        Text(
-                            if (isUploading) "Uploading..." else "Upload Employees",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-            }
+            Text(
+                text = "Staff Roster & Employees",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                fontSize = 17.sp,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = "${uiState.filteredEmployees.size} staff records found",
+                style = MaterialTheme.typography.bodySmall,
+                fontSize = 11.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -233,20 +169,42 @@ fun EmployeesTab(
         OutlinedTextField(
             value = uiState.searchQuery,
             onValueChange = onSearchQueryChange,
-            placeholder = { Text("Search by name, iqama, card or room...") },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search", tint = MaterialTheme.colorScheme.primary) },
+            placeholder = {
+                Text(
+                    text = "Search staff (name, iqama, card)...",
+                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp)
+                )
+            },
             trailingIcon = {
                 if (uiState.searchQuery.isNotEmpty()) {
-                    IconButton(onClick = { onSearchQueryChange("") }) {
-                        Icon(Icons.Default.Clear, contentDescription = "Clear search")
+                    IconButton(
+                        onClick = { onSearchQueryChange("") },
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = "Clear search",
+                            modifier = Modifier.size(16.dp)
+                        )
                     }
                 }
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag("employee_search_input"),
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(10.dp),
             singleLine = true,
+            textStyle = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
                 unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),

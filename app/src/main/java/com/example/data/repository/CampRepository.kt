@@ -458,6 +458,7 @@ class CampRepository(
             db.collection("app_metadata").document("latest")
                 .snapshots()
                 .map { doc ->
+                    val defaultUrl = "https://github.com/newshuntexpress/CampTrack/releases/download/v1.0/CampTrack_v1.0.apk"
                     if (doc.exists()) {
                         try {
                             val versionCode = doc.getLong("versionCode")
@@ -470,7 +471,8 @@ class CampRepository(
                             val notes = doc.getString("releaseNotes")
                                 ?: doc.getString("notes")
                                 ?: "Performance improvements and updates."
-                            val url = doc.getString("downloadUrl").orEmpty()
+                            val rawUrl = doc.getString("downloadUrl").orEmpty()
+                            val url = if (rawUrl.isBlank()) defaultUrl else rawUrl
                             val isMandatory = doc.getBoolean("isMandatory") ?: false
                             val timestamp = doc.getTimestamp("updatedAt")
                             val minRequired = doc.getLong("minRequiredVersionCode") ?: 1L
@@ -486,20 +488,21 @@ class CampRepository(
                                 updatedAt = timestamp
                             )
                         } catch (_: Exception) {
-                            null
+                            AppUpdateInfo(downloadUrl = defaultUrl)
                         }
                     } else {
-                        null
+                        AppUpdateInfo(downloadUrl = defaultUrl)
                     }
                 }
                 .catch { error ->
                     if (error is CancellationException) throw error
-                    emit(null)
+                    emit(AppUpdateInfo(downloadUrl = "https://github.com/newshuntexpress/CampTrack/releases/download/v1.0/CampTrack_v1.0.apk"))
                 }
         )
     }
 
     suspend fun checkLatestAppUpdate(): AppUpdateInfo? = withContext(Dispatchers.IO) {
+        val defaultUrl = "https://github.com/newshuntexpress/CampTrack/releases/download/v1.0/CampTrack_v1.0.apk"
         try {
             val doc = db.collection("app_metadata").document("latest").get().await()
             if (doc.exists()) {
@@ -507,7 +510,8 @@ class CampRepository(
                 val versionName = doc.getString("latestVersionName") ?: doc.getString("versionName") ?: "1.0"
                 val title = doc.getString("updateTitle") ?: "Awazel Camp System Update"
                 val notes = doc.getString("releaseNotes") ?: doc.getString("notes") ?: ""
-                val url = doc.getString("downloadUrl").orEmpty()
+                val rawUrl = doc.getString("downloadUrl").orEmpty()
+                val url = if (rawUrl.isBlank()) defaultUrl else rawUrl
                 val isMandatory = doc.getBoolean("isMandatory") ?: false
                 val timestamp = doc.getTimestamp("updatedAt")
                 val minRequired = doc.getLong("minRequiredVersionCode") ?: 1L
@@ -522,9 +526,11 @@ class CampRepository(
                     isMandatory = isMandatory,
                     updatedAt = timestamp
                 )
-            } else null
+            } else {
+                AppUpdateInfo(downloadUrl = defaultUrl)
+            }
         } catch (_: Exception) {
-            null
+            AppUpdateInfo(downloadUrl = defaultUrl)
         }
     }
 
@@ -609,7 +615,7 @@ class CampRepository(
 
                 val bedTaken = existingInRoom.documents.any { it.getLong("bedNumber")?.toInt() == bedNumber }
                 if (bedTaken) {
-                    return Result.failure(IllegalStateException("Bed $bedNumber in Room $cleanRoomNumber is already occupied."))
+                    return Result.failure(IllegalStateException("Bed $bedNumber in Room $cleanRoomNumber is already booked."))
                 }
             }
 
@@ -691,12 +697,14 @@ class CampRepository(
         phone: String,
         nationality: String,
         dateIn: String,
-        notes: String
+        roomNumber: String = "",
+        notes: String = ""
     ): Result<String> = withContext(Dispatchers.IO) {
         val cleanName = name.trim()
         val cleanIqama = iqamaNumber.trim()
         val cleanPhone = phone.trim()
         val cleanDept = department.trim()
+        val cleanRoom = roomNumber.trim()
 
         if (cleanName.isBlank()) {
             return@withContext Result.failure(IllegalArgumentException("Please enter your full name."))
@@ -736,7 +744,7 @@ class CampRepository(
                 "name" to cleanName,
                 "iqamaNumber" to cleanIqama,
                 "cardNumber" to cleanCard,
-                "roomNumber" to "",
+                "roomNumber" to cleanRoom,
                 "bedNumber" to null,
                 "dateIn" to cleanDateIn,
                 "dateOut" to null,
@@ -906,7 +914,7 @@ class CampRepository(
 
             val bedTaken = existingInRoom.documents.any { it.id != employeeId && it.getLong("bedNumber")?.toInt() == newBedNumber }
             if (bedTaken) {
-                return Result.failure(IllegalStateException("Bed $newBedNumber in Room $cleanRoom is already occupied."))
+                return Result.failure(IllegalStateException("Bed $newBedNumber in Room $cleanRoom is already booked."))
             }
 
             val docRef = db.collection("employees").document(employeeId)

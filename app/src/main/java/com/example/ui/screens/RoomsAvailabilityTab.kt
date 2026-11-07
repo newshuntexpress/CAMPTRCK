@@ -445,7 +445,7 @@ private fun BedMiniSlot(
                     }
                 } else {
                     Text(
-                        text = "Vacant (Available)",
+                        text = "Empty (Available)",
                         style = MaterialTheme.typography.labelSmall,
                         fontSize = 10.sp,
                         color = Green500,

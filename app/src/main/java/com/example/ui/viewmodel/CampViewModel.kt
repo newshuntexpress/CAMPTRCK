@@ -34,8 +34,8 @@ import java.util.Locale
 enum class RoomAvailabilityFilter(val label: String) {
     ALL("All Rooms"),
     AVAILABLE("Has Bed Available"),
-    PARTIAL("1 Bed Vacant"),
-    VACANT("Fully Empty (2 Beds)"),
+    PARTIAL("1 Bed Empty"),
+    VACANT("Empty (2 Beds)"),
     FULL("Full (2/2)")
 }
 
@@ -743,7 +743,8 @@ class CampViewModel(
         phone: String,
         nationality: String,
         dateIn: String,
-        notes: String,
+        roomNumber: String = "",
+        notes: String = "",
         onComplete: (Result<String>) -> Unit
     ) {
         viewModelScope.launch {
@@ -758,6 +759,7 @@ class CampViewModel(
                 phone = phone,
                 nationality = nationality,
                 dateIn = dateIn,
+                roomNumber = roomNumber,
                 notes = notes
             )
             _uiState.update { it.copy(isLoading = false) }

@@ -40,7 +40,7 @@ object ReportGenerator {
 
         val occupiedRowsHtml = buildString {
             if (occupiedRooms.isEmpty()) {
-                append("<tr><td colspan='6' style='text-align:center; padding:10px; color:#64748b;'>No occupied rooms found.</td></tr>")
+                append("<tr><td colspan='6' style='text-align:center; padding:10px; color:#64748b;'>No booked rooms found.</td></tr>")
             } else {
                 occupiedRooms.forEach { r ->
                     val b1 = r.bed1Occupant
@@ -54,7 +54,7 @@ object ReportGenerator {
                     val bed1Text = if (b1 != null) {
                         "<b>${b1.name}</b>$b1StatusBadge<br><small style='color:#475569;'>Iqama: ${b1.iqamaNumber} | Card: ${b1.cardNumber}<br>Trade: ${b1.trade} | In: ${b1.dateIn}</small>"
                     } else {
-                        "<span style='color:#10b981; font-weight:bold;'>[VACANT]</span>"
+                        "<span style='color:#10b981; font-weight:bold;'>[EMPTY]</span>"
                     }
 
                     val b2StatusBadge = when (b2?.status) {
@@ -65,7 +65,7 @@ object ReportGenerator {
                     val bed2Text = if (b2 != null) {
                         "<b>${b2.name}</b>$b2StatusBadge<br><small style='color:#475569;'>Iqama: ${b2.iqamaNumber} | Card: ${b2.cardNumber}<br>Trade: ${b2.trade} | In: ${b2.dateIn}</small>"
                     } else {
-                        "<span style='color:#10b981; font-weight:bold;'>[VACANT]</span>"
+                        "<span style='color:#10b981; font-weight:bold;'>[EMPTY]</span>"
                     }
 
                     val statusBadge = if (r.isFull) {
@@ -96,7 +96,7 @@ object ReportGenerator {
                         <tr>
                             <td style='font-weight:bold; font-size:14px; text-align:center; color:#059669;'>Room ${r.room.roomNumber}</td>
                             <td>${r.room.block}</td>
-                            <td style='text-align:center;'><span style='background:#d1fae5; color:#059669; padding:3px 8px; border-radius:4px; font-weight:bold; font-size:11px;'>2 BEDS VACANT</span></td>
+                            <td style='text-align:center;'><span style='background:#d1fae5; color:#059669; padding:3px 8px; border-radius:4px; font-weight:bold; font-size:11px;'>2 BEDS EMPTY</span></td>
                             <td style='color:#059669; font-weight:500;'>Bed 1 & Bed 2 available for allotment</td>
                         </tr>
                     """.trimIndent())
@@ -162,7 +162,7 @@ object ReportGenerator {
                     </div>
                     <div class="kpi-box">
                         <div class="kpi-val" style="color:#d97706;">${stats.occupiedBeds}</div>
-                        <div class="kpi-lbl">Occupied Beds</div>
+                        <div class="kpi-lbl">Booked Beds</div>
                     </div>
                     <div class="kpi-box">
                         <div class="kpi-val" style="color:#059669;">${stats.availableBeds}</div>
@@ -186,7 +186,7 @@ object ReportGenerator {
                     </div>
                 </div>
 
-                <h2>1. Occupied Rooms & Resident Details (${occupiedRooms.size} Rooms)</h2>
+                <h2>1. Booked Rooms & Resident Details (${occupiedRooms.size} Rooms)</h2>
                 <table>
                     <thead>
                         <tr>
@@ -202,7 +202,7 @@ object ReportGenerator {
                     </tbody>
                 </table>
 
-                <h2>2. Vacant Rooms & Available Capacity (${vacantRooms.size} Rooms)</h2>
+                <h2>2. Empty Rooms & Available Capacity (${vacantRooms.size} Rooms)</h2>
                 <table>
                     <thead>
                         <tr>
@@ -244,16 +244,16 @@ object ReportGenerator {
         sb.appendLine("EXECUTIVE SUMMARY:")
         sb.appendLine("• Total Camp Rooms:    ${stats.totalRooms} (2 Beds Each)")
         sb.appendLine("• Total Bed Capacity:  ${stats.totalBeds} Beds")
-        sb.appendLine("• Occupied Beds:       ${stats.occupiedBeds} (${stats.occupancyPercentage}%)")
+        sb.appendLine("• Booked Beds:         ${stats.occupiedBeds} (${stats.occupancyPercentage}%)")
         sb.appendLine("• Available Free Beds: ${stats.availableBeds}")
-        sb.appendLine("• Fully Occupied Rooms:${stats.fullRoomsCount}")
+        sb.appendLine("• Fully Booked Rooms:  ${stats.fullRoomsCount}")
         sb.appendLine("• 1-Bed Free Rooms:    ${stats.partialRoomsCount}")
         sb.appendLine("• Completely Empty:    ${stats.vacantRoomsCount} Rooms")
         sb.appendLine("• Active In-Camp Staff:${stats.activeEmployeesCount} Residents")
         sb.appendLine("• Staff On Vacation:   ${stats.onVacationEmployeesCount} Employees (Beds Reserved)")
         sb.appendLine("• Total Staff Roster:  ${stats.totalEmployeesCount} Employees")
         sb.appendLine("---------------------------------------------------------")
-        sb.appendLine("1. OCCUPIED ROOMS & RESIDENT ROSTER (${occupiedRooms.size} Rooms):")
+        sb.appendLine("1. BOOKED ROOMS & RESIDENT ROSTER (${occupiedRooms.size} Rooms):")
         sb.appendLine("---------------------------------------------------------")
 
         occupiedRooms.forEach { r ->
@@ -263,20 +263,20 @@ object ReportGenerator {
                 val statusTag = if (b.status == EmployeeStatus.ON_VACATION) " [ON VACATION]" else ""
                 sb.appendLine("  -> Bed 1: ${b.name}$statusTag | Iqama: ${b.iqamaNumber} | Card: ${b.cardNumber} | Trade: ${b.trade} | In: ${b.dateIn}")
             } else {
-                sb.appendLine("  -> Bed 1: [VACANT]")
+                sb.appendLine("  -> Bed 1: [EMPTY]")
             }
             if (r.bed2Occupant != null) {
                 val b = r.bed2Occupant
                 val statusTag = if (b.status == EmployeeStatus.ON_VACATION) " [ON VACATION]" else ""
                 sb.appendLine("  -> Bed 2: ${b.name}$statusTag | Iqama: ${b.iqamaNumber} | Card: ${b.cardNumber} | Trade: ${b.trade} | In: ${b.dateIn}")
             } else {
-                sb.appendLine("  -> Bed 2: [VACANT]")
+                sb.appendLine("  -> Bed 2: [EMPTY]")
             }
             sb.appendLine()
         }
 
         sb.appendLine("---------------------------------------------------------")
-        sb.appendLine("2. VACANT ROOMS AVAILABLE FOR ALLOTMENT (${vacantRooms.size} Rooms):")
+        sb.appendLine("2. EMPTY ROOMS AVAILABLE FOR ALLOTMENT (${vacantRooms.size} Rooms):")
         sb.appendLine("---------------------------------------------------------")
         vacantRooms.forEach { r ->
             sb.appendLine("• Room ${r.room.roomNumber} (${r.room.block}) - 2 Beds Available")

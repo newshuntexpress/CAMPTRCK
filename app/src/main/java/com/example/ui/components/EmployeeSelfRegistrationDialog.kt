@@ -19,6 +19,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -27,12 +30,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.CorporateFare
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.MeetingRoom
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Share
@@ -43,6 +48,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -71,6 +80,7 @@ import com.example.ui.theme.Green500
 import com.example.ui.viewmodel.CampViewModel
 import com.example.util.QrCodeGenerator
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmployeeSelfRegistrationDialog(
     onDismiss: () -> Unit,
@@ -84,9 +94,10 @@ fun EmployeeSelfRegistrationDialog(
         phone: String,
         nationality: String,
         dateIn: String,
-        notes: String,
+        roomNumber: String,
         onComplete: (Result<String>) -> Unit
     ) -> Unit,
+    availableRooms: List<String> = emptyList(),
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -94,13 +105,61 @@ fun EmployeeSelfRegistrationDialog(
     var name by remember { mutableStateOf("") }
     var iqamaNumber by remember { mutableStateOf("") }
     var cardNumber by remember { mutableStateOf("") }
-    var trade by remember { mutableStateOf("Electrician") }
+    var trade by remember { mutableStateOf("") }
     var company by remember { mutableStateOf("AWAZEL CO.") }
     var department by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var nationality by remember { mutableStateOf("Saudi Arabia") }
     var dateIn by remember { mutableStateOf(CampViewModel.getCurrentDateString()) }
-    var notes by remember { mutableStateOf("") }
+    var roomNumber by remember { mutableStateOf("") }
+    var roomDropdownExpanded by remember { mutableStateOf(false) }
+    var selectedBlockFilter by remember { mutableStateOf("All") }
+
+    val defaultCampRooms = remember {
+        val list = mutableListOf<String>()
+        listOf("A", "B", "C", "D").forEach { block ->
+            (1..10).forEach { num ->
+                list.add("$block-$num")
+            }
+        }
+        list.sortedWith(::compareRoomSequences)
+    }
+
+    val allRooms = remember(availableRooms) {
+        val source = if (availableRooms.isNotEmpty()) availableRooms else defaultCampRooms
+        source.distinct().sortedWith(::compareRoomSequences)
+    }
+
+    val availableBlocks = remember(allRooms) {
+        val blocks = linkedSetOf("All")
+        val extracted = allRooms.mapNotNull { room ->
+            when {
+                room.contains("Block ", ignoreCase = true) -> {
+                    "Block " + room.substringAfter("Block ").substringBefore(" ").substringBefore("-").trim()
+                }
+                room.contains("-") -> {
+                    val prefix = room.substringBefore("-").trim()
+                    if (prefix.length in 1..2 && prefix.all { it.isLetter() }) "Block ${prefix.uppercase()}" else null
+                }
+                else -> null
+            }
+        }.distinct().sorted()
+        blocks.addAll(extracted)
+        blocks.toList()
+    }
+
+    val filteredRoomOptions = remember(allRooms, selectedBlockFilter) {
+        val list = if (selectedBlockFilter == "All") {
+            allRooms
+        } else {
+            val prefix = selectedBlockFilter.removePrefix("Block ").trim()
+            allRooms.filter {
+                it.startsWith("$prefix-", ignoreCase = true) ||
+                it.contains(selectedBlockFilter, ignoreCase = true)
+            }
+        }
+        list.sortedWith(::compareRoomSequences)
+    }
 
     var isSubmitting by remember { mutableStateOf(false) }
     var isSubmittedAndLocked by remember { mutableStateOf(false) }
@@ -326,8 +385,9 @@ fun EmployeeSelfRegistrationDialog(
                             Text("Department: $department", fontSize = 12.sp)
                             Text("Company: $company", fontSize = 12.sp)
                             Text("Mobile: $phone", fontSize = 12.sp)
-                            Text("Trade: $trade", fontSize = 12.sp)
+                            Text("Trade: ${trade.ifEmpty { "General Staff" }}", fontSize = 12.sp)
                             if (cardNumber.isNotBlank()) Text("Card No: $cardNumber", fontSize = 12.sp)
+                            if (roomNumber.isNotBlank()) Text("Room No: $roomNumber", fontSize = 12.sp)
                             Text("Status: Pending Room & Bed Assignment", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                         }
                     }
@@ -464,20 +524,6 @@ fun EmployeeSelfRegistrationDialog(
                         enabled = !isSubmitting
                     )
 
-                    // Quick Trade chips
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        listOf("Electrician", "HVAC Tech", "Driver", "Mason", "Welder").forEach { t ->
-                            FilterChip(
-                                selected = trade == t,
-                                onClick = { trade = t },
-                                label = { Text(t, fontSize = 10.sp) }
-                            )
-                        }
-                    }
-
                     // 7. Card Number
                     OutlinedTextField(
                         value = cardNumber,
@@ -517,19 +563,148 @@ fun EmployeeSelfRegistrationDialog(
                         enabled = !isSubmitting
                     )
 
-                    // 10. Notes / Remarks
-                    OutlinedTextField(
-                        value = notes,
-                        onValueChange = { notes = it },
-                        label = { Text("Additional Notes (Optional)", fontSize = 12.sp) },
-                        placeholder = { Text("Special requirements, supervisor name, etc.") },
-                        singleLine = false,
-                        maxLines = 2,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag("self_reg_notes_input"),
-                        enabled = !isSubmitting
-                    )
+                    // 10. Room Number (Interactive Dropdown / List)
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        // Quick Block Filter Chips (e.g. All, Block A, Block B, etc.)
+                        if (availableBlocks.size > 2) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .horizontalScroll(rememberScrollState()),
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Block:",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontSize = 11.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                availableBlocks.forEach { blockName ->
+                                    FilterChip(
+                                        selected = selectedBlockFilter == blockName,
+                                        onClick = { selectedBlockFilter = blockName },
+                                        label = { Text(blockName, fontSize = 11.sp) },
+                                        modifier = Modifier.height(28.dp)
+                                    )
+                                }
+                            }
+                        }
+
+                        ExposedDropdownMenuBox(
+                            expanded = roomDropdownExpanded,
+                            onExpandedChange = {
+                                if (!isSubmitting) roomDropdownExpanded = !roomDropdownExpanded
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            OutlinedTextField(
+                                value = if (roomNumber.isNotEmpty()) "Room $roomNumber" else "",
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("Room Number", fontSize = 12.sp) },
+                                placeholder = { Text("Select room number from list...", fontSize = 12.sp) },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.MeetingRoom,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(18.dp),
+                                        tint = if (roomNumber.isNotEmpty()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                },
+                                trailingIcon = {
+                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = roomDropdownExpanded)
+                                },
+                                singleLine = true,
+                                modifier = Modifier
+                                    .menuAnchor()
+                                    .fillMaxWidth()
+                                    .testTag("self_reg_room_input"),
+                                enabled = !isSubmitting
+                            )
+
+                            ExposedDropdownMenu(
+                                expanded = roomDropdownExpanded,
+                                onDismissRequest = { roomDropdownExpanded = false },
+                                modifier = Modifier.heightIn(max = 240.dp)
+                            ) {
+                                if (filteredRoomOptions.isEmpty()) {
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                "No rooms found in $selectedBlockFilter",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        },
+                                        onClick = { roomDropdownExpanded = false }
+                                    )
+                                } else {
+                                    filteredRoomOptions.forEach { r ->
+                                        val isSelected = roomNumber == r
+                                        DropdownMenuItem(
+                                            text = {
+                                                Row(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                                    verticalAlignment = Alignment.CenterVertically
+                                                ) {
+                                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                                        Icon(
+                                                            Icons.Default.MeetingRoom,
+                                                            contentDescription = null,
+                                                            modifier = Modifier.size(16.dp),
+                                                            tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                                        )
+                                                        Spacer(modifier = Modifier.width(8.dp))
+                                                        Text(
+                                                            text = "Room $r",
+                                                            style = MaterialTheme.typography.bodyMedium,
+                                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                                        )
+                                                    }
+                                                    if (isSelected) {
+                                                        Icon(
+                                                            Icons.Default.Check,
+                                                            contentDescription = "Selected",
+                                                            tint = MaterialTheme.colorScheme.primary,
+                                                            modifier = Modifier.size(18.dp)
+                                                        )
+                                                    }
+                                                }
+                                            },
+                                            onClick = {
+                                                roomNumber = r
+                                                roomDropdownExpanded = false
+                                            },
+                                            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp)
+                                        )
+                                    }
+                                }
+
+                                if (roomNumber.isNotEmpty()) {
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                "Clear Selection (Unallotted)",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.error
+                                            )
+                                        },
+                                        onClick = {
+                                            roomNumber = ""
+                                            roomDropdownExpanded = false
+                                        },
+                                        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -581,7 +756,7 @@ fun EmployeeSelfRegistrationDialog(
                             trimmedPhone,
                             nationality.trim().ifEmpty { "Saudi Arabia" },
                             dateIn.trim().ifEmpty { CampViewModel.getCurrentDateString() },
-                            notes.trim()
+                            roomNumber.trim()
                         ) { result ->
                             isSubmitting = false
                             result.fold(
@@ -628,3 +803,31 @@ fun EmployeeSelfRegistrationDialog(
         }
     )
 }
+
+/**
+ * Natural alphanumeric comparator to ensure room numbers are sequenced properly
+ * e.g. A-1, A-2, A-3 ... A-10, A-11 instead of alphabetical A-1, A-10, A-2.
+ */
+internal fun compareRoomSequences(r1: String, r2: String): Int {
+    val regex = Regex("(\\d+)|(\\D+)")
+    val tokens1 = regex.findAll(r1.trim()).map { it.value }.toList()
+    val tokens2 = regex.findAll(r2.trim()).map { it.value }.toList()
+
+    val minLen = minOf(tokens1.size, tokens2.size)
+    for (i in 0 until minLen) {
+        val t1 = tokens1[i]
+        val t2 = tokens2[i]
+        val num1 = t1.toLongOrNull()
+        val num2 = t2.toLongOrNull()
+
+        if (num1 != null && num2 != null) {
+            val numCompare = num1.compareTo(num2)
+            if (numCompare != 0) return numCompare
+        } else {
+            val strCompare = t1.compareTo(t2, ignoreCase = true)
+            if (strCompare != 0) return strCompare
+        }
+    }
+    return tokens1.size.compareTo(tokens2.size)
+}
+

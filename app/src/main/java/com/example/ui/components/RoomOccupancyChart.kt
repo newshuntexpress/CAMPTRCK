@@ -175,7 +175,7 @@ fun RoomOccupancyChart(
             // 1. Occupied Rooms in a single horizontal row
             // 2. Vacant Rooms in a separate single horizontal row
             if (displayMode == ChartDisplayMode.ROOMS) {
-                // Row 1: Occupied Rooms (Single horizontal row without top-side duplicate icon)
+                // Row 1: Booked Rooms (Clean single row without duplicate room count or percentage badge)
                 Surface(
                     shape = RoundedCornerShape(8.dp),
                     color = (if (stats.fullRoomsCount > stats.partialRoomsCount) Red500 else Amber500).copy(alpha = 0.08f),
@@ -186,55 +186,37 @@ fun RoomOccupancyChart(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 10.dp, vertical = 7.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
+                        horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.weight(1f, fill = false)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(8.dp)
-                                    .clip(CircleShape)
-                                    .background(if (stats.fullRoomsCount > stats.partialRoomsCount) Red500 else Amber500)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "Occupied Rooms",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = "(${stats.fullRoomsCount} Full • ${stats.partialRoomsCount} 1-Bed Free)",
-                                style = MaterialTheme.typography.bodySmall,
-                                fontSize = 11.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-
-                        Surface(
-                            shape = RoundedCornerShape(6.dp),
-                            color = (if (stats.fullRoomsCount > stats.partialRoomsCount) Red500 else Amber500).copy(alpha = 0.15f)
-                        ) {
-                            Text(
-                                text = "$occupiedRoomsTotal rooms ($occupiedPercent%)",
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = if (stats.fullRoomsCount > stats.partialRoomsCount) Red500 else Amber500,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                            )
-                        }
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .clip(CircleShape)
+                                .background(if (stats.fullRoomsCount > stats.partialRoomsCount) Red500 else Amber500)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Booked Rooms",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "(${stats.fullRoomsCount} Full • ${stats.partialRoomsCount} 1-Bed Free)",
+                            style = MaterialTheme.typography.bodySmall,
+                            fontSize = 11.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
                 }
 
-                // Row 2: Vacant Rooms (Separate single horizontal row)
+                // Row 2: Empty Rooms (Separate single horizontal row)
                 Surface(
                     shape = RoundedCornerShape(8.dp),
                     color = Green500.copy(alpha = 0.08f),
@@ -245,51 +227,33 @@ fun RoomOccupancyChart(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 10.dp, vertical = 7.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
+                        horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.weight(1f, fill = false)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(8.dp)
-                                    .clip(CircleShape)
-                                    .background(Green500)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "Vacant Rooms",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = "(${vacantRoomsCount * 2} Free Beds Available)",
-                                style = MaterialTheme.typography.bodySmall,
-                                fontSize = 11.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-
-                        Surface(
-                            shape = RoundedCornerShape(6.dp),
-                            color = Green500.copy(alpha = 0.15f)
-                        ) {
-                            Text(
-                                text = "$vacantRoomsCount rooms ($vacantPercent%)",
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = Green500,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                            )
-                        }
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .clip(CircleShape)
+                                .background(Green500)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Empty Rooms",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "(${vacantRoomsCount * 2} Free Beds Available)",
+                            style = MaterialTheme.typography.bodySmall,
+                            fontSize = 11.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
                 }
             } else {
@@ -320,7 +284,7 @@ fun RoomOccupancyChart(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Occupied Beds",
+                                text = "Booked Beds",
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface,
@@ -698,18 +662,18 @@ fun RoomOccupancyChart(
                             fontSize = 11.sp
                         )
                         Text(
-                            text = "🟡 ${stats.partialRoomsCount} 1-Bed Vacant",
+                            text = "🟡 ${stats.partialRoomsCount} 1-Bed Empty",
                             style = MaterialTheme.typography.labelSmall,
                             fontSize = 11.sp
                         )
                         Text(
-                            text = "🟢 ${vacantRoomsCount} Vacant",
+                            text = "🟢 ${vacantRoomsCount} Empty",
                             style = MaterialTheme.typography.labelSmall,
                             fontSize = 11.sp
                         )
                     } else {
                         Text(
-                            text = "🟡 ${occupiedBeds} Beds Occupied",
+                            text = "🟡 ${occupiedBeds} Beds Booked",
                             style = MaterialTheme.typography.labelSmall,
                             fontSize = 11.sp
                         )

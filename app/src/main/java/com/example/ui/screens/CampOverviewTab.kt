@@ -222,7 +222,7 @@ fun CampOverviewTab(
                     Spacer(modifier = Modifier.height(10.dp))
 
                     DistributionBarItem(
-                        label = "Fully Available Rooms (2 Beds Free)",
+                        label = "Empty Rooms (2 Beds Free)",
                         count = stats.vacantRoomsCount,
                         total = stats.totalRooms,
                         color = Green500
@@ -231,7 +231,7 @@ fun CampOverviewTab(
                     Spacer(modifier = Modifier.height(10.dp))
 
                     DistributionBarItem(
-                        label = "Partially Occupied Rooms (1 Bed Free)",
+                        label = "Partially Booked Rooms (1 Bed Free)",
                         count = stats.partialRoomsCount,
                         total = stats.totalRooms,
                         color = Amber500
@@ -240,7 +240,7 @@ fun CampOverviewTab(
                     Spacer(modifier = Modifier.height(10.dp))
 
                     DistributionBarItem(
-                        label = "Fully Occupied Rooms (0 Beds Free)",
+                        label = "Fully Booked Rooms (0 Beds Free)",
                         count = stats.fullRoomsCount,
                         total = stats.totalRooms,
                         color = Red500
@@ -449,7 +449,7 @@ fun CampOverviewTab(
                             color = MaterialTheme.colorScheme.surfaceVariant
                         ) {
                             Text(
-                                text = "$occupancyPercent% Occupied",
+                                text = "$occupancyPercent% Booked",
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
@@ -469,7 +469,7 @@ fun CampOverviewTab(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = "$availableBeds Beds Available ($occupiedBeds Occupied)",
+                            text = "$availableBeds Beds Available ($occupiedBeds Booked)",
                             style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.SemiBold,
                             color = if (availableBeds > 0) Green500 else Red500
@@ -725,9 +725,9 @@ private fun generateSummaryReport(uiState: CampUiState): String {
     sb.appendLine("EXECUTIVE SUMMARY:")
     sb.appendLine("* Total Camp Rooms:   ${stats.totalRooms}")
     sb.appendLine("* Total Bed Capacity:  ${stats.totalBeds}")
-    sb.appendLine("* Occupied Beds:      ${stats.occupiedBeds}")
+    sb.appendLine("* Booked Beds:        ${stats.occupiedBeds}")
     sb.appendLine("* Available Free Beds: ${stats.availableBeds}")
-    sb.appendLine("* Fully Occupied Rooms:${stats.fullRoomsCount}")
+    sb.appendLine("* Fully Booked Rooms:  ${stats.fullRoomsCount}")
     sb.appendLine("* 1-Bed Free Rooms:    ${stats.partialRoomsCount}")
     sb.appendLine("* Completely Empty:    ${stats.vacantRoomsCount}")
     sb.appendLine("* Active In-Camp Staff:${stats.activeEmployeesCount}")

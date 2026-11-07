@@ -85,7 +85,7 @@ fun DailyReportDialog(
                         )
                     }
                     Text(
-                        text = "Printable summary of all occupied & vacant rooms",
+                        text = "Printable summary of all booked & empty rooms",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -115,8 +115,8 @@ fun DailyReportDialog(
                     ) {
                         ReportMetricChip(label = "Total Rooms", value = "${stats.totalRooms}")
                         ReportMetricChip(label = "Total Beds", value = "${stats.totalBeds}")
-                        ReportMetricChip(label = "Occupied", value = "${stats.occupiedBeds}", color = Amber500)
-                        ReportMetricChip(label = "Vacant Beds", value = "${stats.availableBeds}", color = Green500)
+                        ReportMetricChip(label = "Booked", value = "${stats.occupiedBeds}", color = Amber500)
+                        ReportMetricChip(label = "Empty Beds", value = "${stats.availableBeds}", color = Green500)
                         ReportMetricChip(label = "Rate", value = "${stats.occupancyPercentage}%")
                     }
                 }

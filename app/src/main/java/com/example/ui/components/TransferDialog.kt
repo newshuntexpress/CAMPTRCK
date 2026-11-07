@@ -149,7 +149,7 @@ fun TransferDialog(
                     OutlinedTextField(
                         value = if (selectedRoomObj != null) {
                             "Room ${selectedRoomObj.room.roomNumber} - ${selectedRoomObj.room.block} (${selectedRoomObj.availableBeds} bed free)"
-                        } else "No vacant room available",
+                        } else "No empty room available",
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Destination Room") },
@@ -225,7 +225,7 @@ fun TransferDialog(
                                 Column {
                                     Text("Bed 1", fontWeight = FontWeight.SemiBold)
                                     Text(
-                                        text = if (bed1Available) "Available" else "Occupied",
+                                        text = if (bed1Available) "Available" else "Booked",
                                         style = MaterialTheme.typography.labelSmall,
                                         color = if (bed1Available) Green500 else MaterialTheme.colorScheme.error
                                     )
@@ -256,7 +256,7 @@ fun TransferDialog(
                                 Column {
                                     Text("Bed 2", fontWeight = FontWeight.SemiBold)
                                     Text(
-                                        text = if (bed2Available) "Available" else "Occupied",
+                                        text = if (bed2Available) "Available" else "Booked",
                                         style = MaterialTheme.typography.labelSmall,
                                         color = if (bed2Available) Green500 else MaterialTheme.colorScheme.error
                                     )

@@ -226,7 +226,7 @@ private fun BedOccupancyCard(
                     color = if (occupant != null) Red500.copy(alpha = 0.15f) else Green500.copy(alpha = 0.15f)
                 ) {
                     Text(
-                        text = if (occupant != null) "OCCUPIED" else "AVAILABLE",
+                        text = if (occupant != null) "BOOKED" else "AVAILABLE",
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = if (occupant != null) Red500 else Green500,
@@ -374,9 +374,9 @@ private fun BedOccupancyCard(
                     }
                 }
             } else {
-                // Vacant bed notice & Allot action
+                // Empty bed notice & Allot action
                 Text(
-                    text = if (isAdmin) "This bed is currently unassigned and ready for allotment." else "This bed is vacant (View-Only).",
+                    text = if (isAdmin) "This bed is currently unassigned and ready for allotment." else "This bed is empty (View-Only).",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
