@@ -47,6 +47,7 @@ class ExampleUnitTest {
     assertTrue("Allotment URL should contain empId", url.contains("empId=emp_123"))
     assertTrue("Allotment URL should contain iqama", url.contains("iqama=2489102341"))
     assertEquals("camptrack://register", com.example.util.QrCodeGenerator.REGISTRATION_DEEP_LINK)
+    assertEquals("https://awazelcamp.online/", com.example.util.QrCodeGenerator.REGISTRATION_WEB_URL)
   }
 
   @Test

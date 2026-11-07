@@ -25,12 +25,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Android
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Print
 import androidx.compose.material.icons.filled.QrCode
@@ -74,6 +75,7 @@ fun MoreActionsTab(
     onOpenRegistrationQrClick: () -> Unit,
     onDownloadApkClick: () -> Unit,
     onAddNewRoomClick: () -> Unit,
+    onOpenWebPortalClick: () -> Unit = {},
     onUploadEmployees: (Uri, onComplete: (Int, List<String>) -> Unit) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {
@@ -155,6 +157,23 @@ fun MoreActionsTab(
                         Icon(Icons.Default.QrCode, contentDescription = "Self-REG QR", modifier = Modifier.size(20.dp))
                         Spacer(modifier = Modifier.width(10.dp))
                         Text("Self-REG QR Code (Staff Registration)", fontWeight = FontWeight.Bold)
+                    }
+
+                    // Web Portal Access Button (All Facilities)
+                    OutlinedButton(
+                        onClick = onOpenWebPortalClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("more_open_web_browser_button"),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Language,
+                            contentDescription = "Open Web Portal",
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text("Open Web Portal (awazelcamp.online • All Facilities)", fontWeight = FontWeight.SemiBold)
                     }
 
                     // 2. Upload Employees Button
@@ -488,7 +507,7 @@ fun MoreActionsTab(
                             showDownloadSuccessDialog = false
                         }
                     ) {
-                        Icon(Icons.Default.OpenInNew, contentDescription = null, modifier = Modifier.size(14.dp))
+                        Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(4.dp))
                         Text("Open")
                     }

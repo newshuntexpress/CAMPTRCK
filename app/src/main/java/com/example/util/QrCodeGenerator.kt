@@ -20,7 +20,21 @@ import java.io.FileOutputStream
 object QrCodeGenerator {
 
     const val REGISTRATION_DEEP_LINK = "camptrack://register"
-    const val REGISTRATION_WEB_URL = "https://camptrack.awazel.com/register"
+    const val REGISTRATION_WEB_URL = "https://awazelcamp.online/"
+
+    /**
+     * Opens the web portal directly in the device's default web browser.
+     */
+    fun openWebPortalInBrowser(context: Context, url: String = REGISTRATION_WEB_URL) {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            android.util.Log.e("QrCodeGenerator", "Failed to open web browser: ${e.message}", e)
+        }
+    }
 
     fun generateEmployeeAllotmentUrl(employeeId: String, iqama: String): String {
         return "camptrack://allot?empId=$employeeId&iqama=$iqama"

@@ -97,9 +97,16 @@ data class CampUiState(
     val showUserPanelDialog: Boolean = false,
     val showAppUpdateDialog: Boolean = false,
     val showSyncInfoDialog: Boolean = false,
+    val showWebPortalDialog: Boolean = false,
     val isOnline: Boolean = true,
     val lastSyncTime: String = "Just now",
-    val appUpdateInfo: AppUpdateInfo? = null,
+    val appUpdateInfo: AppUpdateInfo? = AppUpdateInfo(
+        latestVersionCode = 1L,
+        latestVersionName = "1.0",
+        updateTitle = "CampTrack Android APK",
+        releaseNotes = "Awazel Camp Accommodation & 2-Bed Allotments System. Production APK package with offline room database and real-time cloud sync.",
+        downloadUrl = "https://raw.githubusercontent.com/newshuntexpress/CampTrack/main/CampTrack.apk"
+    ),
     val hasAvailableUpdate: Boolean = false,
     val isDownloadingApk: Boolean = false,
     val apkDownloadProgress: Int = 0,
@@ -1020,8 +1027,27 @@ class CampViewModel(
         }
     }
 
+    fun openWebPortalDialog() {
+        _uiState.update { it.copy(showWebPortalDialog = true) }
+    }
+
+    fun closeWebPortalDialog() {
+        _uiState.update { it.copy(showWebPortalDialog = false) }
+    }
+
     fun openAppUpdateDialog() {
-        _uiState.update { it.copy(showAppUpdateDialog = true) }
+        _uiState.update { current ->
+            current.copy(
+                showAppUpdateDialog = true,
+                appUpdateInfo = current.appUpdateInfo ?: AppUpdateInfo(
+                    latestVersionCode = 1L,
+                    latestVersionName = "1.0",
+                    updateTitle = "CampTrack Android APK",
+                    releaseNotes = "Awazel Camp Accommodation & 2-Bed Allotments System. Production APK package with offline room database and real-time cloud sync.",
+                    downloadUrl = "https://raw.githubusercontent.com/newshuntexpress/CampTrack/main/CampTrack.apk"
+                )
+            )
+        }
     }
 
     fun closeAppUpdateDialog() {
@@ -1033,7 +1059,13 @@ class CampViewModel(
     }
 
     fun startDownloadAndInstallApk(context: android.content.Context) {
-        val updateInfo = uiState.value.appUpdateInfo ?: return
+        val updateInfo = uiState.value.appUpdateInfo ?: AppUpdateInfo(
+            latestVersionCode = 1L,
+            latestVersionName = "1.0",
+            updateTitle = "CampTrack Android APK",
+            releaseNotes = "Awazel Camp Accommodation & 2-Bed Allotments System.",
+            downloadUrl = "https://raw.githubusercontent.com/newshuntexpress/CampTrack/main/CampTrack.apk"
+        )
         if (uiState.value.isDownloadingApk) return
 
         val directUrl = updateInfo.downloadUrl.trim()

@@ -33,11 +33,23 @@
                 <data android:scheme="camptrack" />
             </intent-filter>
 
-            <!-- HTTPS Web App Links (https://camptrack.awazel.com/register) -->
+            <!-- HTTPS Web App Links (https://awazelcamp.online/) -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="awazelcamp.online" />
+                <data
+                    android:scheme="https"
+                    android:host="www.awazelcamp.online" />
+                <data
+                    android:scheme="https"
+                    android:host="camptracawazel.online" />
+                <data
+                    android:scheme="https"
+                    android:host="www.camptracawazel.online" />
                 <data
                     android:scheme="https"
                     android:host="camptrack.awazel.com" />

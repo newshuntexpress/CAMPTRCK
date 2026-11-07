@@ -1,0 +1,1954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AWAZEL CO. - Camp Accommodation &amp; 2-Bed Allotments Portal</title>
+  <meta name="description" content="Awazel Company Camp Management System - Live Bed Occupancy, 2-Bed Allotments, Staff Roster, Self-Registration, and Daily Reports.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231b5e20'><path d='M7 13c1.66 0 3-1.34 3-3S8.36 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4z'/></svg>">
+  <style>
+    :root {
+      --primary: #1b5e20;
+      --primary-light: #2e7d32;
+      --primary-dark: #0f3d13;
+      --primary-container: #dcfce7;
+      --on-primary-container: #14532d;
+      --surface: #ffffff;
+      --background: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --border-focus: #1b5e20;
+      --occupied-bg: #fee2e2;
+      --occupied-text: #991b1b;
+      --vacant-bg: #dcfce7;
+      --vacant-text: #166534;
+      --warning-bg: #fef3c7;
+      --warning-text: #92400e;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--background);
+      color: var(--text-main);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Bar Header */
+    header.top-bar {
+      background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+      color: #ffffff;
+      padding: 12px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-logo {
+      background: #ffffff;
+      color: var(--primary);
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .brand-info h1 {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      margin: 0;
+      text-transform: uppercase;
+    }
+    .brand-info p {
+      font-size: 11px;
+      opacity: 0.9;
+      margin: 0;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .domain-badge {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4ade80;
+    }
+    .apk-btn {
+      background: #ffffff;
+      color: var(--primary);
+      border: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .apk-btn:hover { background: #f0fdf4; transform: translateY(-1px); }
+
+    /* Navigation Bar */
+    nav.nav-tabs {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      overflow-x: auto;
+      padding: 0 16px;
+      gap: 8px;
+      scrollbar-width: none;
+    }
+    nav.nav-tabs::-webkit-scrollbar { display: none; }
+    .nav-btn {
+      padding: 12px 14px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover {
+      color: var(--primary);
+    }
+    .nav-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      font-weight: 700;
+    }
+
+    /* Main Container */
+    main.container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* Views */
+    .view-section {
+      display: none;
+    }
+    .view-section.active {
+      display: block;
+      animation: fadeIn 0.25s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Stat Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--primary);
+    }
+    .stat-card.occupied::before { background: #ef4444; }
+    .stat-card.vacant::before { background: #10b981; }
+    .stat-card.staff::before { background: #3b82f6; }
+    .stat-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stat-value {
+      font-size: 26px;
+      font-weight: 800;
+      margin-top: 4px;
+      color: var(--text-main);
+    }
+    .stat-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Quick Action Buttons Bar */
+    .quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+      background: var(--surface);
+      padding: 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      align-items: center;
+    }
+    .action-btn {
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: #ffffff;
+      color: var(--text-main);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    .action-btn:hover {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      border-color: var(--primary);
+    }
+    .action-btn.primary {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+    .action-btn.primary:hover {
+      background: var(--primary-light);
+    }
+
+    /* Section Headers */
+    .section-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .section-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .search-input {
+      padding: 7px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      font-size: 13px;
+      min-width: 220px;
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--primary); }
+    .select-dropdown {
+      padding: 7px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      font-size: 13px;
+      background: #ffffff;
+      outline: none;
+    }
+
+    /* Rooms Grid */
+    .rooms-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 14px;
+    }
+    .room-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .room-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .room-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+    .room-title-badge {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .occupancy-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+    .badge-vacant { background: var(--vacant-bg); color: var(--vacant-text); }
+    .badge-partial { background: var(--warning-bg); color: var(--warning-text); }
+    .badge-full { background: var(--occupied-bg); color: var(--occupied-text); }
+
+    /* Beds Container */
+    .beds-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .bed-slot {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      font-size: 12px;
+      background: #f8fafc;
+    }
+    .bed-slot.occupied {
+      background: #ffffff;
+      border-left: 3px solid #ef4444;
+    }
+    .bed-slot.vacant {
+      background: #f0fdf4;
+      border-left: 3px solid #10b981;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .bed-header {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      color: var(--text-muted);
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+    .occupant-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .occupant-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.3;
+      margin-top: 2px;
+    }
+    .bed-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .btn-xs {
+      padding: 3px 7px;
+      font-size: 11px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      cursor: pointer;
+    }
+    .btn-xs:hover { background: #f1f5f9; }
+    .btn-xs.danger { color: #dc2626; border-color: #fca5a5; }
+    .btn-xs.danger:hover { background: #fee2e2; }
+    .btn-xs.allot { background: var(--primary); color: #fff; border-color: var(--primary); font-weight: 600; }
+
+    /* Table Styles (Employees & Report) */
+    .table-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      box-shadow: var(--shadow-sm);
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      text-align: left;
+    }
+    table.data-table th {
+      background: #f1f5f9;
+      color: var(--text-muted);
+      font-weight: 700;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    table.data-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    table.data-table tr:hover { background: #f8fafc; }
+
+    /* Self-Registration Form */
+    .form-card {
+      max-width: 680px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+    }
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      outline: none;
+      transition: border 0.15s;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 2px rgba(27, 94, 32, 0.15);
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 600px) {
+      .form-row { grid-template-columns: 1fr; }
+    }
+
+    /* Modal Dialogs */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      max-width: 520px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 20px;
+      box-shadow: var(--shadow-lg);
+      animation: modalPop 0.2s ease-out;
+    }
+    @keyframes modalPop {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+    }
+    .modal-title { font-size: 16px; font-weight: 700; }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+
+    /* Print Formatting */
+    @media print {
+      header.top-bar, nav.nav-tabs, .quick-actions, .filter-bar, .no-print {
+        display: none !important;
+      }
+      body, main.container {
+        background: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+      }
+      .view-section { display: none !important; }
+      #view-report { display: block !important; }
+      .table-container { border: none !important; box-shadow: none !important; }
+      table.data-table th, table.data-table td {
+        border-color: #cbd5e1 !important;
+        font-size: 10px !important;
+        padding: 4px 6px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top App Bar -->
+  <header class="top-bar">
+    <div class="brand-title">
+      <div class="brand-logo">A</div>
+      <div class="brand-info">
+        <h1>AWAZEL CO. CAMP TRACK</h1>
+        <p>Accommodation &amp; 2-Bed Allotments Management System</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="domain-badge">
+        <span class="status-dot"></span>
+        <span id="domain-label">awazelcamp.online</span>
+      </div>
+      <a href="CampTrack.apk" class="apk-btn" download title="Download Android APK">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993s-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993s-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.411 13.8562 8.089 12 8.089s-3.5902.322-5.1367.8607L4.841 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/></svg>
+        Download APK
+      </a>
+    </div>
+  </header>
+
+  <!-- Navigation Bar (Tabs for All Facilities) -->
+  <nav class="nav-tabs">
+    <button class="nav-btn active" onclick="switchTab('overview')">
+      📊 Overview
+    </button>
+    <button class="nav-btn" onclick="switchTab('rooms')">
+      🛏️ Rooms &amp; Beds (Allotments)
+    </button>
+    <button class="nav-btn" onclick="switchTab('employees')">
+      👥 Staff Roster
+    </button>
+    <button class="nav-btn" onclick="switchTab('self-reg')">
+      📝 Self-Registration
+    </button>
+    <button class="nav-btn" onclick="switchTab('report')">
+      📄 Daily Report
+    </button>
+    <button class="nav-btn" onclick="switchTab('upload')">
+      📤 Upload Employees
+    </button>
+    <button class="nav-btn" onclick="switchTab('qr')">
+      📱 Self-REG QR
+    </button>
+  </nav>
+
+  <!-- Main Workspace -->
+  <main class="container">
+
+    <!-- 1. CAMP OVERVIEW (DASHBOARD) -->
+    <section id="view-overview" class="view-section active">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Rooms</div>
+          <div class="stat-value" id="stat-total-rooms">0</div>
+          <div class="stat-sub">Awazel Accommodation Blocks</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Beds</div>
+          <div class="stat-value" id="stat-total-beds">0</div>
+          <div class="stat-sub">Strict 2 Beds per room</div>
+        </div>
+        <div class="stat-card occupied">
+          <div class="stat-label">Booked Beds</div>
+          <div class="stat-value" id="stat-occupied-beds">0</div>
+          <div class="stat-sub" id="stat-occupancy-rate">0% Occupancy</div>
+        </div>
+        <div class="stat-card vacant">
+          <div class="stat-label">Available Beds</div>
+          <div class="stat-value" id="stat-available-beds">0</div>
+          <div class="stat-sub">Ready for staff allotment</div>
+        </div>
+        <div class="stat-card staff">
+          <div class="stat-label">Active Staff</div>
+          <div class="stat-value" id="stat-active-staff">0</div>
+          <div class="stat-sub">Registered Awazel Employees</div>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="quick-actions">
+        <button class="action-btn primary" onclick="openAllotModal()">
+          ➕ Quick Bed Allotment
+        </button>
+        <button class="action-btn" onclick="openAddRoomModal()">
+          🏢 Add New Room
+        </button>
+        <button class="action-btn" onclick="switchTab('self-reg')">
+          📝 Staff Registration Form
+        </button>
+        <button class="action-btn" onclick="switchTab('report')">
+          🖨️ Daily Occupancy Report
+        </button>
+        <button class="action-btn" onclick="switchTab('upload')">
+          📂 Bulk Upload Employees
+        </button>
+        <button class="action-btn" onclick="openQrModal()">
+          📱 Share Registration QR
+        </button>
+      </div>
+
+      <!-- Live Room Blocks Summary -->
+      <div class="section-header">
+        <div class="section-title">Block-wise Accommodation Breakdown</div>
+      </div>
+      <div class="stats-grid" id="blocks-summary-grid"></div>
+    </section>
+
+    <!-- 2. ROOMS & 2-BED ALLOTMENTS -->
+    <section id="view-rooms" class="view-section">
+      <div class="section-header">
+        <div class="section-title">Camp Rooms &amp; 2-Bed Allocations</div>
+        <div class="filter-bar">
+          <input type="text" id="rooms-search" class="search-input" placeholder="Search room (e.g. A-1) or occupant..." oninput="filterRooms()">
+          <select id="rooms-block-filter" class="select-dropdown" onchange="filterRooms()">
+            <option value="ALL">All Blocks</option>
+            <option value="Block A">Block A</option>
+            <option value="Block B">Block B</option>
+            <option value="Block C">Block C</option>
+            <option value="Block D">Block D</option>
+          </select>
+          <select id="rooms-status-filter" class="select-dropdown" onchange="filterRooms()">
+            <option value="ALL">All Status</option>
+            <option value="AVAILABLE">Available Beds Only</option>
+            <option value="FULL">Fully Booked</option>
+            <option value="EMPTY">Completely Empty</option>
+          </select>
+          <button class="action-btn primary" onclick="openAddRoomModal()">+ Add Room</button>
+        </div>
+      </div>
+
+      <!-- Rooms Grid with Sequential Order -->
+      <div class="rooms-grid" id="rooms-list-container"></div>
+    </section>
+
+    <!-- 3. STAFF ROSTER & EMPLOYEES -->
+    <section id="view-employees" class="view-section">
+      <div class="section-header">
+        <div class="section-title">Staff Roster &amp; Employee Database</div>
+        <div class="filter-bar">
+          <input type="text" id="emp-search" class="search-input" placeholder="Search by Name, Iqama, Card, Trade..." oninput="filterEmployees()">
+          <select id="emp-status-filter" class="select-dropdown" onchange="filterEmployees()">
+            <option value="ALL">All Employees</option>
+            <option value="ACTIVE">Active Staff</option>
+            <option value="PENDING">Pending Bed Allotment</option>
+            <option value="CHECKED_OUT">Checked-out / Left</option>
+          </select>
+          <button class="action-btn primary" onclick="openAddEmployeeModal()">+ Add Employee</button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Employee Name</th>
+              <th>Iqama / National ID</th>
+              <th>Gate / Card No</th>
+              <th>Trade / Designation</th>
+              <th>Department</th>
+              <th>Room &amp; Bed</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="employees-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 4. EMPLOYEE SELF-REGISTRATION FORM -->
+    <section id="view-self-reg" class="view-section">
+      <div class="form-card">
+        <div class="section-header" style="border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+          <div>
+            <div class="section-title">Employee Self-Registration Form</div>
+            <p style="font-size:12px; color:var(--text-muted);">Awazel Co. Staff Accommodation Onboarding</p>
+          </div>
+          <button class="action-btn" onclick="openQrModal()">📱 Show QR</button>
+        </div>
+
+        <form id="self-reg-form" onsubmit="handleSelfRegistration(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="sr-name">Employee Full Name *</label>
+              <input type="text" id="sr-name" required placeholder="e.g. Tariq Al-Otaibi">
+            </div>
+            <div class="form-group">
+              <label for="sr-iqama">Iqama / National ID *</label>
+              <input type="text" id="sr-iqama" required placeholder="10-digit Iqama number">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="sr-mobile">Mobile Number *</label>
+              <input type="tel" id="sr-mobile" required placeholder="05XXXXXXXX">
+            </div>
+            <div class="form-group">
+              <label for="sr-department">Department *</label>
+              <select id="sr-department" required>
+                <option value="Production">Production</option>
+                <option value="Maintenance">Maintenance</option>
+                <option value="Quality Assurance">Quality Assurance</option>
+                <option value="Logistics &amp; Transport">Logistics &amp; Transport</option>
+                <option value="Warehouse &amp; Supply">Warehouse &amp; Supply</option>
+                <option value="Security">Security</option>
+                <option value="Camp Operations">Camp Operations</option>
+                <option value="Administration">Administration</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="sr-company">Company</label>
+              <input type="text" id="sr-company" value="AWAZEL CO." readonly style="background:#f1f5f9;">
+            </div>
+            <div class="form-group">
+              <label for="sr-trade">Trade / Designation *</label>
+              <input type="text" id="sr-trade" required placeholder="Enter trade or position">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="sr-card">Gate Card No. / Employee ID</label>
+              <input type="text" id="sr-card" placeholder="e.g. CRD-092">
+            </div>
+            <div class="form-group">
+              <label for="sr-date">Date of Joining</label>
+              <input type="date" id="sr-date">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="sr-nationality">Nationality</label>
+              <input type="text" id="sr-nationality" placeholder="e.g. Saudi, Indian, Filipino...">
+            </div>
+            <div class="form-group">
+              <label for="sr-room">Select Camp Room (In Sequence) *</label>
+              <select id="sr-room" required>
+                <option value="">-- Choose a room from sequence list --</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 14px;">
+            <button type="submit" class="action-btn primary" style="width:100%; justify-content:center; padding:12px; font-size:14px;">
+              Submit Employee Registration
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- 5. DAILY CAMP OCCUPANCY REPORT -->
+    <section id="view-report" class="view-section">
+      <div class="section-header no-print">
+        <div class="section-title">Daily Camp Occupancy &amp; Allotment Report</div>
+        <div class="filter-bar">
+          <button class="action-btn primary" onclick="window.print()">
+            🖨️ Print / Save as PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Printable Report Layout -->
+      <div style="background:#fff; border:1px solid var(--border); border-radius:var(--radius-md); padding:24px; box-shadow:var(--shadow-sm);">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid var(--primary); padding-bottom:12px; margin-bottom:16px;">
+          <div>
+            <h2 style="color:var(--primary); font-size:20px; font-weight:800; margin:0;">AWAZEL CO.</h2>
+            <h3 style="font-size:14px; font-weight:700; color:#334155; margin:2px 0;">CAMP ACCOMMODATION &amp; 2-BED ALLOTMENTS REPORT</h3>
+            <p style="font-size:12px; color:var(--text-muted); margin:0;">Daily Staff Occupancy &amp; Vacancy Audit</p>
+          </div>
+          <div style="text-align:right; font-size:11px; color:var(--text-muted);">
+            <div><strong>Generated Date:</strong> <span id="report-date">-</span></div>
+            <div><strong>System Timestamp:</strong> <span id="report-timestamp">-</span></div>
+            <div><strong>Domain:</strong> awazelcamp.online</div>
+          </div>
+        </div>
+
+        <!-- Summary Matrix Table -->
+        <table class="data-table" style="margin-bottom:20px;">
+          <thead>
+            <tr>
+              <th>Total Camp Rooms</th>
+              <th>Total Bed Capacity</th>
+              <th>Occupied Beds</th>
+              <th>Available Vacant Beds</th>
+              <th>Active Registered Staff</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="rep-total-rooms" style="font-weight:700;">-</td>
+              <td id="rep-total-beds" style="font-weight:700;">-</td>
+              <td id="rep-occupied-beds" style="color:#b91c1c; font-weight:700;">-</td>
+              <td id="rep-vacant-beds" style="color:#15803d; font-weight:700;">-</td>
+              <td id="rep-active-staff" style="font-weight:700;">-</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Room Allotments Table -->
+        <h4 style="font-size:13px; font-weight:700; margin-bottom:8px; color:var(--primary);">Room-by-Room 2-Bed Register</h4>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width:70px;">Room</th>
+              <th style="width:70px;">Block</th>
+              <th>Bed 1 Occupant</th>
+              <th>Bed 2 Occupant</th>
+              <th style="width:90px;">Occupancy</th>
+            </tr>
+          </thead>
+          <tbody id="report-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 6. BULK UPLOAD EMPLOYEES -->
+    <section id="view-upload" class="view-section">
+      <div class="form-card">
+        <div class="section-header">
+          <div class="section-title">Bulk Employee Import (CSV / Excel)</div>
+          <button class="action-btn" onclick="downloadSampleCsv()">📥 Download Sample CSV</button>
+        </div>
+        <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:16px;">
+          Quickly upload multiple staff members at once using a comma-separated values (CSV) file.
+        </p>
+
+        <div style="border:2px dashed var(--border); border-radius:var(--radius-md); padding:30px; text-align:center; background:#f8fafc; cursor:pointer;" onclick="document.getElementById('csv-file-input').click()">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="#64748b" style="margin-bottom:8px;"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+          <div style="font-weight:700; font-size:14px;">Click to Select CSV File</div>
+          <div style="font-size:12px; color:var(--text-muted);">Columns: Name, Iqama, CardNo, Trade, Department, Company, Room, Bed</div>
+          <input type="file" id="csv-file-input" accept=".csv,text/csv,text/plain" style="display:none;" onchange="handleCsvFile(event)">
+        </div>
+
+        <div id="csv-preview-container" style="display:none; margin-top:20px;">
+          <h4 style="font-size:13px; font-weight:700; margin-bottom:8px;">Import Preview (<span id="csv-count">0</span> employees)</h4>
+          <div class="table-container" style="max-height:240px; overflow-y:auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Name</th><th>Iqama</th><th>Trade</th><th>Department</th><th>Room</th>
+                </tr>
+              </thead>
+              <tbody id="csv-preview-body"></tbody>
+            </table>
+          </div>
+          <div style="margin-top:14px; display:flex; justify-content:flex-end; gap:8px;">
+            <button class="action-btn" onclick="cancelCsvImport()">Cancel</button>
+            <button class="action-btn primary" onclick="commitCsvImport()">Commit &amp; Import Staff</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. SELF-REGISTRATION QR CODE -->
+    <section id="view-qr" class="view-section">
+      <div class="form-card" style="text-align:center;">
+        <div class="section-title" style="justify-content:center; margin-bottom:4px;">
+          Employee Self-Registration QR Code
+        </div>
+        <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:16px;">
+          Display or print this QR code at camp gates or reception. Scanning it opens the portal immediately.
+        </p>
+
+        <div style="display:inline-block; padding:16px; background:#ffffff; border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow-md); margin-bottom:16px;">
+          <!-- Inline SVG QR Code Generator for awazelcamp.online -->
+          <svg id="qr-svg-display" width="220" height="220" viewBox="0 0 33 33" shape-rendering="crispEdges">
+            <!-- Background -->
+            <rect width="33" height="33" fill="#ffffff" />
+            <!-- Corner Finder Pattern 1 (Top Left) -->
+            <path fill="#000" d="M2 2h7v7H2zM3 3v5h5V3zM4 4h3v3H4z"/>
+            <!-- Corner Finder Pattern 2 (Top Right) -->
+            <path fill="#000" d="M24 2h7v7H24zM25 3v5h5V3zM26 4h3v3H26z"/>
+            <!-- Corner Finder Pattern 3 (Bottom Left) -->
+            <path fill="#000" d="M2 24h7v7H2zM3 25v5h5V25zM4 26h3v3H4z"/>
+            <!-- Data pattern representing https://awazelcamp.online/ -->
+            <path fill="#000" d="M11 2h2v1h-2zM15 2h3v1h-3zM20 2h2v1h-2zM11 4h1v2h-1zM14 4h2v1h-2zM18 4h2v2h-2zM21 4h1v1h-1zM10 6h2v1h-2zM13 6h2v2h-2zM17 6h1v1h-1zM20 6h1v2h-1zM11 8h2v2h-2zM15 8h1v1h-1zM18 8h1v1h-1zM2 11h1v2H2zM5 11h2v1H5zM9 11h1v1H9zM12 11h2v2h-2zM16 11h2v1h-2zM20 11h3v1h-3zM25 11h2v1h-2zM29 11h2v2h-2zM3 13h2v2H3zM7 13h1v1H7zM10 13h1v2h-1zM15 13h1v1h-1zM18 13h2v1h-2zM22 13h2v1h-2zM26 13h1v2h-1zM2 15h2v1H2zM6 15h2v1H6zM11 15h3v1h-3zM16 15h1v2h-1zM19 15h2v1h-2zM23 15h2v1h-2zM28 15h3v1h-3zM3 17h1v2H3zM6 17h1v1H6zM9 17h2v1H9zM13 17h2v1h-2zM17 17h2v2h-2zM21 17h1v1h-1zM24 17h2v1h-2zM28 17h2v2h-2zM2 19h2v1H2zM5 19h2v2H5zM9 19h2v1H9zM13 19h1v1h-1zM16 19h1v1h-1zM20 19h3v1h-3zM25 19h1v2h-1zM28 19h2v1h-2zM2 21h3v1H2zM7 21h2v1H7zM11 21h2v1h-2zM15 21h2v2h-2zM19 21h1v1h-1zM22 21h2v1h-2zM26 21h2v1h-2zM30 21h1v1h-1zM11 23h3v1h-3zM16 23h2v1h-2zM20 23h1v2h-1zM23 23h2v1h-2zM27 23h2v1h-2zM10 25h1v2h-1zM13 25h2v1h-2zM17 25h2v1h-2zM21 25h2v2h-2zM25 25h2v1h-2zM29 25h2v1h-2zM11 27h2v1h-2zM15 27h1v2h-1zM18 27h2v1h-2zM22 27h1v1h-1zM25 27h1v1h-1zM28 27h2v2h-2zM12 29h2v2h-2zM16 29h2v1h-2zM20 29h3v1h-3zM25 29h1v1h-1zM28 29h1v1h-1z"/>
+          </svg>
+        </div>
+
+        <div style="background:#f1f5f9; padding:10px 14px; border-radius:8px; font-size:13px; font-weight:700; color:var(--primary); margin-bottom:14px;">
+          https://awazelcamp.online/
+        </div>
+
+        <div style="display:flex; justify-content:center; gap:8px;">
+          <button class="action-btn primary" onclick="copyPortalLink()">📋 Copy URL Link</button>
+          <button class="action-btn" onclick="window.open('https://awazelcamp.online/', '_blank')">🌐 Open in Browser</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: ALLOT BED -->
+  <div id="modal-allot" class="modal-backdrop">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">Allot Camp Bed to Staff</div>
+        <button class="modal-close" onclick="closeModal('modal-allot')">&times;</button>
+      </div>
+      <form onsubmit="handleAllotSubmit(event)">
+        <div class="form-group">
+          <label for="allot-emp-select">Select Employee *</label>
+          <select id="allot-emp-select" required></select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="allot-room-select">Room Number (Sequential) *</label>
+            <select id="allot-room-select" required onchange="handleAllotRoomChange()"></select>
+          </div>
+          <div class="form-group">
+            <label for="allot-bed-select">Bed Slot (2 Beds/Room) *</label>
+            <select id="allot-bed-select" required>
+              <option value="1">Bed 1</option>
+              <option value="2">Bed 2</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="allot-date">Check-in Date *</label>
+          <input type="date" id="allot-date" required>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:14px;">
+          <button type="button" class="action-btn" onclick="closeModal('modal-allot')">Cancel</button>
+          <button type="submit" class="action-btn primary">Confirm Bed Allotment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: TRANSFER BED -->
+  <div id="modal-transfer" class="modal-backdrop">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">Transfer Room / Bed</div>
+        <button class="modal-close" onclick="closeModal('modal-transfer')">&times;</button>
+      </div>
+      <form onsubmit="handleTransferSubmit(event)">
+        <input type="hidden" id="trans-emp-id">
+        <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:12px;">
+          Transferring: <strong id="trans-emp-name" style="color:var(--text-main);"></strong> (<span id="trans-current-room"></span>)
+        </p>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="trans-target-room">New Room (Sequential) *</label>
+            <select id="trans-target-room" required onchange="handleTransferRoomChange()"></select>
+          </div>
+          <div class="form-group">
+            <label for="trans-target-bed">New Bed *</label>
+            <select id="trans-target-bed" required>
+              <option value="1">Bed 1</option>
+              <option value="2">Bed 2</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:14px;">
+          <button type="button" class="action-btn" onclick="closeModal('modal-transfer')">Cancel</button>
+          <button type="submit" class="action-btn primary">Complete Room Transfer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD ROOM -->
+  <div id="modal-add-room" class="modal-backdrop">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">Add New Camp Room</div>
+        <button class="modal-close" onclick="closeModal('modal-add-room')">&times;</button>
+      </div>
+      <form onsubmit="handleAddRoomSubmit(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="new-room-num">Room Number *</label>
+            <input type="text" id="new-room-num" required placeholder="e.g. A-11, B-5, C-1">
+          </div>
+          <div class="form-group">
+            <label for="new-room-block">Block *</label>
+            <select id="new-room-block" required>
+              <option value="Block A">Block A</option>
+              <option value="Block B">Block B</option>
+              <option value="Block C">Block C</option>
+              <option value="Block D">Block D</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Capacity</label>
+          <input type="text" value="2 Beds (Standard Awazel Camp Room)" readonly style="background:#f1f5f9;">
+        </div>
+        <div class="form-group">
+          <label for="new-room-notes">Notes (Optional)</label>
+          <input type="text" id="new-room-notes" placeholder="e.g. AC Room, Ground floor">
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:14px;">
+          <button type="button" class="action-btn" onclick="closeModal('modal-add-room')">Cancel</button>
+          <button type="submit" class="action-btn primary">Add Room</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD EMPLOYEE -->
+  <div id="modal-add-emp" class="modal-backdrop">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">Register New Employee</div>
+        <button class="modal-close" onclick="closeModal('modal-add-emp')">&times;</button>
+      </div>
+      <form onsubmit="handleAddEmployeeSubmit(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="ne-name">Full Name *</label>
+            <input type="text" id="ne-name" required placeholder="Full name">
+          </div>
+          <div class="form-group">
+            <label for="ne-iqama">Iqama / National ID *</label>
+            <input type="text" id="ne-iqama" required placeholder="10-digit ID">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="ne-card">Card / Gate No</label>
+            <input type="text" id="ne-card" placeholder="CRD-XXX">
+          </div>
+          <div class="form-group">
+            <label for="ne-dept">Department *</label>
+            <select id="ne-dept" required>
+              <option value="Production">Production</option>
+              <option value="Maintenance">Maintenance</option>
+              <option value="Quality Assurance">Quality Assurance</option>
+              <option value="Logistics">Logistics</option>
+              <option value="Security">Security</option>
+              <option value="Administration">Administration</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="ne-trade">Trade / Designation *</label>
+            <input type="text" id="ne-trade" required placeholder="Designation">
+          </div>
+          <div class="form-group">
+            <label for="ne-company">Company</label>
+            <input type="text" id="ne-company" value="AWAZEL CO." readonly style="background:#f1f5f9;">
+          </div>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:14px;">
+          <button type="button" class="action-btn" onclick="closeModal('modal-add-emp')">Cancel</button>
+          <button type="submit" class="action-btn primary">Save Employee</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- APPLICATION LOGIC & STATE ENGINE -->
+  <script>
+    // --- State Management ---
+    const STORAGE_KEY_ROOMS = "awazel_camp_rooms_v1";
+    const STORAGE_KEY_EMPLOYEES = "awazel_camp_employees_v1";
+
+    let campRooms = [];
+    let campEmployees = [];
+    let pendingCsvRows = [];
+
+    // --- Natural Room Sequence Comparator (e.g. A-1, A-2, A-10, B-1...) ---
+    function compareRoomSequences(a, b) {
+      const parse = (room) => {
+        const parts = (room || "").split("-");
+        const block = parts[0] || "";
+        const num = parseInt(parts[1], 10) || 0;
+        return { block, num };
+      };
+      const pA = parse(a.roomNumber);
+      const pB = parse(b.roomNumber);
+      if (pA.block !== pB.block) return pA.block.localeCompare(pB.block);
+      return pA.num - pB.num;
+    }
+
+    // --- Initial Default Seed Data (if empty) ---
+    function getInitialSeedRooms() {
+      const rooms = [];
+      const blocks = ["Block A", "Block B", "Block C", "Block D"];
+      const prefix = ["A", "B", "C", "D"];
+      blocks.forEach((blk, idx) => {
+        const p = prefix[idx];
+        const count = (p === "A" || p === "B") ? 12 : 8;
+        for (let i = 1; i <= count; i++) {
+          rooms.push({
+            roomNumber: `${p}-${i}`,
+            block: blk,
+            capacity: 2,
+            note: ""
+          });
+        }
+      });
+      return rooms;
+    }
+
+    function getInitialSeedEmployees() {
+      return [
+        {
+          id: 101,
+          name: "Mohammed Al-Harbi",
+          iqamaNumber: "2498172635",
+          cardNumber: "CRD-01",
+          department: "Maintenance",
+          company: "AWAZEL CO.",
+          trade: "Senior HVAC Technician",
+          roomNumber: "A-1",
+          bedNumber: 1,
+          dateIn: "2026-01-15",
+          status: "ACTIVE",
+          phone: "0501234567"
+        },
+        {
+          id: 102,
+          name: "Suresh Kumar",
+          iqamaNumber: "2489102938",
+          cardNumber: "CRD-02",
+          department: "Production",
+          company: "AWAZEL CO.",
+          trade: "Bitumen Line Operator",
+          roomNumber: "A-1",
+          bedNumber: 2,
+          dateIn: "2026-02-01",
+          status: "ACTIVE",
+          phone: "0559876543"
+        },
+        {
+          id: 103,
+          name: "Rashid Khan",
+          iqamaNumber: "2501928374",
+          cardNumber: "CRD-03",
+          department: "Quality Assurance",
+          company: "AWAZEL CO.",
+          trade: "Lab Inspector",
+          roomNumber: "A-2",
+          bedNumber: 1,
+          dateIn: "2026-02-10",
+          status: "ACTIVE",
+          phone: "0543219876"
+        },
+        {
+          id: 104,
+          name: "Ali Al-Ghamdi",
+          iqamaNumber: "2389102948",
+          cardNumber: "CRD-04",
+          department: "Logistics",
+          company: "AWAZEL CO.",
+          trade: "Forklift Operator",
+          roomNumber: "B-1",
+          bedNumber: 1,
+          dateIn: "2026-01-20",
+          status: "ACTIVE",
+          phone: "0567891234"
+        }
+      ];
+    }
+
+    function loadState() {
+      try {
+        const storedRooms = localStorage.getItem(STORAGE_KEY_ROOMS);
+        const storedEmployees = localStorage.getItem(STORAGE_KEY_EMPLOYEES);
+
+        campRooms = storedRooms ? JSON.parse(storedRooms) : getInitialSeedRooms();
+        campEmployees = storedEmployees ? JSON.parse(storedEmployees) : getInitialSeedEmployees();
+      } catch (e) {
+        campRooms = getInitialSeedRooms();
+        campEmployees = getInitialSeedEmployees();
+      }
+      campRooms.sort(compareRoomSequences);
+      persistState();
+    }
+
+    function persistState() {
+      try {
+        localStorage.setItem(STORAGE_KEY_ROOMS, JSON.stringify(campRooms));
+        localStorage.setItem(STORAGE_KEY_EMPLOYEES, JSON.stringify(campEmployees));
+      } catch (_) {}
+      renderAll();
+    }
+
+    // --- Computed Views & Metrics ---
+    function getOccupantsForRoom(roomNumber) {
+      const occs = campEmployees.filter(e => e.roomNumber === roomNumber && e.status === "ACTIVE");
+      const b1 = occs.find(e => e.bedNumber === 1) || null;
+      const b2 = occs.find(e => e.bedNumber === 2) || null;
+      return {
+        bed1: b1,
+        bed2: b2,
+        count: (b1 ? 1 : 0) + (b2 ? 1 : 0)
+      };
+    }
+
+    function getCampStats() {
+      const totalRooms = campRooms.length;
+      const totalBeds = totalRooms * 2;
+      let occupiedBeds = 0;
+      campRooms.forEach(r => {
+        const occ = getOccupantsForRoom(r.roomNumber);
+        occupiedBeds += occ.count;
+      });
+      const availableBeds = Math.max(0, totalBeds - occupiedBeds);
+      const activeStaff = campEmployees.filter(e => e.status === "ACTIVE").length;
+      const occupancyRate = totalBeds > 0 ? Math.round((occupiedBeds / totalBeds) * 100) : 0;
+
+      return { totalRooms, totalBeds, occupiedBeds, availableBeds, activeStaff, occupancyRate };
+    }
+
+    // --- Render Functions ---
+    function renderOverview() {
+      const stats = getCampStats();
+      document.getElementById("stat-total-rooms").textContent = stats.totalRooms;
+      document.getElementById("stat-total-beds").textContent = stats.totalBeds;
+      document.getElementById("stat-occupied-beds").textContent = stats.occupiedBeds;
+      document.getElementById("stat-occupancy-rate").textContent = `${stats.occupancyRate}% Occupancy`;
+      document.getElementById("stat-available-beds").textContent = stats.availableBeds;
+      document.getElementById("stat-active-staff").textContent = stats.activeStaff;
+
+      // Block-wise breakdown
+      const blocksMap = {};
+      campRooms.forEach(r => {
+        if (!blocksMap[r.block]) blocksMap[r.block] = { rooms: 0, beds: 0, occupied: 0 };
+        blocksMap[r.block].rooms++;
+        blocksMap[r.block].beds += 2;
+        const occ = getOccupantsForRoom(r.roomNumber);
+        blocksMap[r.block].occupied += occ.count;
+      });
+
+      const blocksContainer = document.getElementById("blocks-summary-grid");
+      blocksContainer.innerHTML = "";
+      Object.keys(blocksMap).sort().forEach(blk => {
+        const data = blocksMap[blk];
+        const vacant = data.beds - data.occupied;
+        const pct = Math.round((data.occupied / data.beds) * 100);
+
+        const card = document.createElement("div");
+        card.className = "stat-card";
+        card.innerHTML = `
+          <div class="stat-label">${blk}</div>
+          <div class="stat-value" style="font-size:20px;">${data.occupied} / ${data.beds} <span style="font-size:12px; font-weight:normal;">Beds</span></div>
+          <div class="stat-sub">${data.rooms} Rooms • <span style="color:#166534; font-weight:700;">${vacant} Vacant</span> (${pct}%)</div>
+        `;
+        blocksContainer.appendChild(card);
+      });
+    }
+
+    function renderRooms() {
+      const container = document.getElementById("rooms-list-container");
+      const search = (document.getElementById("rooms-search").value || "").trim().toLowerCase();
+      const blockFilter = document.getElementById("rooms-block-filter").value;
+      const statusFilter = document.getElementById("rooms-status-filter").value;
+
+      container.innerHTML = "";
+
+      const filtered = campRooms.filter(r => {
+        if (blockFilter !== "ALL" && r.block !== blockFilter) return false;
+        const occ = getOccupantsForRoom(r.roomNumber);
+
+        if (statusFilter === "AVAILABLE" && occ.count >= 2) return false;
+        if (statusFilter === "FULL" && occ.count < 2) return false;
+        if (statusFilter === "EMPTY" && occ.count > 0) return false;
+
+        if (search) {
+          const matchRoom = r.roomNumber.toLowerCase().includes(search);
+          const matchB1 = occ.bed1 && (occ.bed1.name.toLowerCase().includes(search) || occ.bed1.iqamaNumber.includes(search));
+          const matchB2 = occ.bed2 && (occ.bed2.name.toLowerCase().includes(search) || occ.bed2.iqamaNumber.includes(search));
+          if (!matchRoom && !matchB1 && !matchB2) return false;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = "<div style='grid-column: 1/-1; text-align:center; padding:30px; color:#64748b;'>No rooms found matching filters.</div>";
+        return;
+      }
+
+      filtered.forEach(r => {
+        const occ = getOccupantsForRoom(r.roomNumber);
+        const card = document.createElement("div");
+        card.className = "room-card";
+
+        let badgeClass = "badge-vacant";
+        let badgeText = "2 Vacant Beds";
+        if (occ.count === 2) {
+          badgeClass = "badge-full";
+          badgeText = "Fully Occupied";
+        } else if (occ.count === 1) {
+          badgeClass = "badge-partial";
+          badgeText = "1 Vacant Bed";
+        }
+
+        card.innerHTML = `
+          <div class="room-card-header">
+            <div>
+              <span class="room-title-badge">Room ${r.roomNumber}</span>
+              <span style="font-size:11px; color:var(--text-muted); margin-left:6px;">(${r.block})</span>
+            </div>
+            <span class="occupancy-badge ${badgeClass}">${badgeText}</span>
+          </div>
+
+          <div class="beds-container">
+            <!-- Bed 1 -->
+            <div class="bed-slot ${occ.bed1 ? 'occupied' : 'vacant'}">
+              <div class="bed-header">
+                <span>BED 1</span>
+                <span>${occ.bed1 ? 'Occupied' : 'Vacant'}</span>
+              </div>
+              ${occ.bed1 ? `
+                <div class="occupant-name">${occ.bed1.name}</div>
+                <div class="occupant-meta">Iqama: ${occ.bed1.iqamaNumber} • ${occ.bed1.trade}</div>
+                <div class="bed-actions">
+                  <button class="btn-xs danger" onclick="checkOutEmployee(${occ.bed1.id})">Check-Out</button>
+                  <button class="btn-xs" onclick="openTransferModal(${occ.bed1.id})">Transfer</button>
+                </div>
+              ` : `
+                <div style="font-size:12px; color:#166534; font-weight:600;">Available Bed</div>
+                <button class="btn-xs allot" onclick="openAllotModalForRoom('${r.roomNumber}', 1)">Allot Bed 1</button>
+              `}
+            </div>
+
+            <!-- Bed 2 -->
+            <div class="bed-slot ${occ.bed2 ? 'occupied' : 'vacant'}">
+              <div class="bed-header">
+                <span>BED 2</span>
+                <span>${occ.bed2 ? 'Occupied' : 'Vacant'}</span>
+              </div>
+              ${occ.bed2 ? `
+                <div class="occupant-name">${occ.bed2.name}</div>
+                <div class="occupant-meta">Iqama: ${occ.bed2.iqamaNumber} • ${occ.bed2.trade}</div>
+                <div class="bed-actions">
+                  <button class="btn-xs danger" onclick="checkOutEmployee(${occ.bed2.id})">Check-Out</button>
+                  <button class="btn-xs" onclick="openTransferModal(${occ.bed2.id})">Transfer</button>
+                </div>
+              ` : `
+                <div style="font-size:12px; color:#166534; font-weight:600;">Available Bed</div>
+                <button class="btn-xs allot" onclick="openAllotModalForRoom('${r.roomNumber}', 2)">Allot Bed 2</button>
+              `}
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderEmployees() {
+      const tbody = document.getElementById("employees-table-body");
+      const search = (document.getElementById("emp-search").value || "").trim().toLowerCase();
+      const statusFilter = document.getElementById("emp-status-filter").value;
+
+      tbody.innerHTML = "";
+
+      const filtered = campEmployees.filter(e => {
+        if (statusFilter === "ACTIVE" && e.status !== "ACTIVE") return false;
+        if (statusFilter === "CHECKED_OUT" && e.status !== "CHECKED_OUT") return false;
+        if (statusFilter === "PENDING" && (e.roomNumber || e.status !== "ACTIVE")) return false;
+
+        if (search) {
+          const matchName = e.name.toLowerCase().includes(search);
+          const matchIqama = e.iqamaNumber.includes(search);
+          const matchCard = (e.cardNumber || "").toLowerCase().includes(search);
+          const matchTrade = (e.trade || "").toLowerCase().includes(search);
+          const matchDept = (e.department || "").toLowerCase().includes(search);
+          if (!matchName && !matchIqama && !matchCard && !matchTrade && !matchDept) return false;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='8' style='text-align:center; padding:20px; color:#64748b;'>No staff records found.</td></tr>";
+        return;
+      }
+
+      filtered.forEach(e => {
+        const tr = document.createElement("tr");
+        const roomBedText = (e.roomNumber && e.bedNumber) ? `<strong>Room ${e.roomNumber}</strong> (Bed ${e.bedNumber})` : `<span style='color:#d97706; font-weight:700;'>Pending Allotment</span>`;
+        const statusBadge = e.status === "ACTIVE" ? `<span class="occupancy-badge badge-vacant">ACTIVE</span>` : `<span class="occupancy-badge badge-full">CHECKED OUT</span>`;
+
+        tr.innerHTML = `
+          <td><strong>${e.name}</strong><br><small style="color:var(--text-muted);">${e.phone || ""}</small></td>
+          <td><code>${e.iqamaNumber}</code></td>
+          <td>${e.cardNumber || "-"}</td>
+          <td>${e.trade || "-"}</td>
+          <td>${e.department || "-"}</td>
+          <td>${roomBedText}</td>
+          <td>${statusBadge}</td>
+          <td>
+            <div style="display:flex; gap:4px;">
+              ${(e.roomNumber && e.status === "ACTIVE") ? `
+                <button class="btn-xs danger" onclick="checkOutEmployee(${e.id})">Check-Out</button>
+                <button class="btn-xs" onclick="openTransferModal(${e.id})">Transfer</button>
+              ` : `
+                <button class="btn-xs allot" onclick="openAllotModalForEmployee(${e.id})">Allot Bed</button>
+              `}
+              <button class="btn-xs danger" onclick="deleteEmployee(${e.id})" title="Delete">&times;</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function populateSequentialRoomDropdowns() {
+      // Sort rooms in strict sequence (A-1, A-2, A-10, B-1...)
+      campRooms.sort(compareRoomSequences);
+
+      // Self Registration Room Dropdown
+      const srSelect = document.getElementById("sr-room");
+      srSelect.innerHTML = `<option value="">-- Choose a room from sequence list --</option>`;
+      campRooms.forEach(r => {
+        const occ = getOccupantsForRoom(r.roomNumber);
+        const vacantBeds = 2 - occ.count;
+        const opt = document.createElement("option");
+        opt.value = r.roomNumber;
+        opt.textContent = `Room ${r.roomNumber} (${r.block}) • ${vacantBeds} / 2 Vacant`;
+        srSelect.appendChild(opt);
+      });
+
+      // Allotment Modal Room Dropdown
+      const allotSelect = document.getElementById("allot-room-select");
+      allotSelect.innerHTML = "";
+      campRooms.forEach(r => {
+        const occ = getOccupantsForRoom(r.roomNumber);
+        const opt = document.createElement("option");
+        opt.value = r.roomNumber;
+        opt.textContent = `Room ${r.roomNumber} (${2 - occ.count} Vacant)`;
+        allotSelect.appendChild(opt);
+      });
+
+      // Transfer Modal Room Dropdown
+      const transSelect = document.getElementById("trans-target-room");
+      transSelect.innerHTML = "";
+      campRooms.forEach(r => {
+        const occ = getOccupantsForRoom(r.roomNumber);
+        const opt = document.createElement("option");
+        opt.value = r.roomNumber;
+        opt.textContent = `Room ${r.roomNumber} (${2 - occ.count} Vacant)`;
+        transSelect.appendChild(opt);
+      });
+    }
+
+    function renderReport() {
+      const stats = getCampStats();
+      const today = new Date().toISOString().split("T")[0];
+      const now = new Date().toLocaleString();
+
+      document.getElementById("report-date").textContent = today;
+      document.getElementById("report-timestamp").textContent = now;
+
+      document.getElementById("rep-total-rooms").textContent = stats.totalRooms;
+      document.getElementById("rep-total-beds").textContent = stats.totalBeds;
+      document.getElementById("rep-occupied-beds").textContent = stats.occupiedBeds;
+      document.getElementById("rep-vacant-beds").textContent = stats.availableBeds;
+      document.getElementById("rep-active-staff").textContent = stats.activeStaff;
+
+      const tbody = document.getElementById("report-table-body");
+      tbody.innerHTML = "";
+
+      campRooms.forEach(r => {
+        const occ = getOccupantsForRoom(r.roomNumber);
+        const b1Text = occ.bed1 ? `<strong>${occ.bed1.name}</strong><br><small style="color:var(--text-muted);">Iqama: ${occ.bed1.iqamaNumber} | ${occ.bed1.trade}</small>` : `<span style="color:#166534; font-weight:700;">[VACANT]</span>`;
+        const b2Text = occ.bed2 ? `<strong>${occ.bed2.name}</strong><br><small style="color:var(--text-muted);">Iqama: ${occ.bed2.iqamaNumber} | ${occ.bed2.trade}</small>` : `<span style="color:#166534; font-weight:700;">[VACANT]</span>`;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${r.roomNumber}</strong></td>
+          <td>${r.block}</td>
+          <td>${b1Text}</td>
+          <td>${b2Text}</td>
+          <td><span class="occupancy-badge ${occ.count === 2 ? 'badge-full' : (occ.count === 1 ? 'badge-partial' : 'badge-vacant')}">${occ.count} / 2 Beds</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderAll() {
+      renderOverview();
+      renderRooms();
+      renderEmployees();
+      populateSequentialRoomDropdowns();
+      renderReport();
+    }
+
+    // --- Tab Switching ---
+    function switchTab(tabId) {
+      document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.remove("active"));
+      document.querySelectorAll(".view-section").forEach(sec => sec.classList.remove("active"));
+
+      const targetSection = document.getElementById(`view-${tabId}`);
+      if (targetSection) targetSection.classList.add("active");
+
+      // Match nav button
+      const navButtons = document.querySelectorAll(".nav-btn");
+      const tabNames = ["overview", "rooms", "employees", "self-reg", "report", "upload", "qr"];
+      const idx = tabNames.indexOf(tabId);
+      if (idx >= 0 && navButtons[idx]) {
+        navButtons[idx].classList.add("active");
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // --- Search & Filter Handlers ---
+    function filterRooms() { renderRooms(); }
+    function filterEmployees() { renderEmployees(); }
+
+    // --- Self-Registration Form Submission ---
+    function handleSelfRegistration(e) {
+      e.preventDefault();
+      const name = document.getElementById("sr-name").value.trim();
+      const iqama = document.getElementById("sr-iqama").value.trim();
+      const mobile = document.getElementById("sr-mobile").value.trim();
+      const department = document.getElementById("sr-department").value;
+      const trade = document.getElementById("sr-trade").value.trim();
+      const card = document.getElementById("sr-card").value.trim() || `CRD-${Date.now().toString().slice(-4)}`;
+      const dateIn = document.getElementById("sr-date").value || new Date().toISOString().split("T")[0];
+      const roomNumber = document.getElementById("sr-room").value;
+
+      if (!name || !iqama || !trade || !roomNumber) {
+        alert("Please fill in all required fields including Room Number.");
+        return;
+      }
+
+      // Automatically allot to first vacant bed in chosen sequential room
+      const occ = getOccupantsForRoom(roomNumber);
+      let bedNumber = 1;
+      if (occ.bed1 && !occ.bed2) bedNumber = 2;
+      else if (occ.bed1 && occ.bed2) {
+        alert(`Room ${roomNumber} is currently fully occupied (2/2 beds). Please select another sequential room.`);
+        return;
+      }
+
+      const newEmp = {
+        id: Date.now(),
+        name,
+        iqamaNumber: iqama,
+        cardNumber: card,
+        department,
+        company: "AWAZEL CO.",
+        trade,
+        roomNumber,
+        bedNumber,
+        dateIn,
+        status: "ACTIVE",
+        phone: mobile
+      };
+
+      campEmployees.push(newEmp);
+      persistState();
+
+      alert(`✅ Registration Successful!\n\nWelcome ${name}.\nYou have been registered and allotted Room ${roomNumber} (Bed ${bedNumber}).`);
+      document.getElementById("self-reg-form").reset();
+      switchTab("rooms");
+    }
+
+    // --- Modal Management ---
+    function openModal(id) { document.getElementById(id).classList.add("open"); }
+    function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+
+    function openAddRoomModal() {
+      document.getElementById("new-room-num").value = "";
+      document.getElementById("new-room-notes").value = "";
+      openModal("modal-add-room");
+    }
+
+    function handleAddRoomSubmit(e) {
+      e.preventDefault();
+      const num = document.getElementById("new-room-num").value.trim().toUpperCase();
+      const block = document.getElementById("new-room-block").value;
+      const note = document.getElementById("new-room-notes").value.trim();
+
+      if (!num) return;
+      if (campRooms.some(r => r.roomNumber === num)) {
+        alert(`Room ${num} already exists!`);
+        return;
+      }
+
+      campRooms.push({ roomNumber: num, block, capacity: 2, note });
+      campRooms.sort(compareRoomSequences);
+      persistState();
+      closeModal("modal-add-room");
+      alert(`Room ${num} added successfully!`);
+    }
+
+    function openAddEmployeeModal() {
+      document.getElementById("ne-name").value = "";
+      document.getElementById("ne-iqama").value = "";
+      document.getElementById("ne-trade").value = "";
+      openModal("modal-add-emp");
+    }
+
+    function handleAddEmployeeSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById("ne-name").value.trim();
+      const iqama = document.getElementById("ne-iqama").value.trim();
+      const dept = document.getElementById("ne-dept").value;
+      const trade = document.getElementById("ne-trade").value.trim();
+      const card = document.getElementById("ne-card").value.trim() || `CRD-${Date.now().toString().slice(-4)}`;
+
+      if (!name || !iqama || !trade) return;
+
+      const newEmp = {
+        id: Date.now(),
+        name,
+        iqamaNumber: iqama,
+        cardNumber: card,
+        department: dept,
+        company: "AWAZEL CO.",
+        trade,
+        roomNumber: "",
+        bedNumber: null,
+        dateIn: new Date().toISOString().split("T")[0],
+        status: "ACTIVE"
+      };
+
+      campEmployees.push(newEmp);
+      persistState();
+      closeModal("modal-add-emp");
+      alert(`Staff member ${name} added! You can now allot a bed.`);
+    }
+
+    function openAllotModal() {
+      populateAllotEmployeeSelect();
+      document.getElementById("allot-date").value = new Date().toISOString().split("T")[0];
+      handleAllotRoomChange();
+      openModal("modal-allot");
+    }
+
+    function openAllotModalForRoom(roomNumber, bedNumber) {
+      populateAllotEmployeeSelect();
+      document.getElementById("allot-room-select").value = roomNumber;
+      document.getElementById("allot-bed-select").value = bedNumber;
+      document.getElementById("allot-date").value = new Date().toISOString().split("T")[0];
+      openModal("modal-allot");
+    }
+
+    function openAllotModalForEmployee(employeeId) {
+      populateAllotEmployeeSelect();
+      document.getElementById("allot-emp-select").value = employeeId;
+      document.getElementById("allot-date").value = new Date().toISOString().split("T")[0];
+      handleAllotRoomChange();
+      openModal("modal-allot");
+    }
+
+    function populateAllotEmployeeSelect() {
+      const select = document.getElementById("allot-emp-select");
+      select.innerHTML = "";
+      const pending = campEmployees.filter(e => !e.roomNumber && e.status === "ACTIVE");
+      if (pending.length === 0) {
+        campEmployees.filter(e => e.status === "ACTIVE").forEach(e => {
+          const opt = document.createElement("option");
+          opt.value = e.id;
+          opt.textContent = `${e.name} (${e.iqamaNumber}) - Current: ${e.roomNumber || 'None'}`;
+          select.appendChild(opt);
+        });
+      } else {
+        pending.forEach(e => {
+          const opt = document.createElement("option");
+          opt.value = e.id;
+          opt.textContent = `${e.name} (${e.iqamaNumber}) • ${e.trade}`;
+          select.appendChild(opt);
+        });
+      }
+    }
+
+    function handleAllotRoomChange() {
+      const room = document.getElementById("allot-room-select").value;
+      const bedSelect = document.getElementById("allot-bed-select");
+      const occ = getOccupantsForRoom(room);
+      bedSelect.innerHTML = "";
+
+      const opt1 = document.createElement("option");
+      opt1.value = "1";
+      opt1.textContent = `Bed 1 ${occ.bed1 ? `(Occupied: ${occ.bed1.name})` : '(Vacant)'}`;
+      if (occ.bed1) opt1.disabled = true;
+      bedSelect.appendChild(opt1);
+
+      const opt2 = document.createElement("option");
+      opt2.value = "2";
+      opt2.textContent = `Bed 2 ${occ.bed2 ? `(Occupied: ${occ.bed2.name})` : '(Vacant)'}`;
+      if (occ.bed2) opt2.disabled = true;
+      bedSelect.appendChild(opt2);
+
+      if (!occ.bed1) bedSelect.value = "1";
+      else if (!occ.bed2) bedSelect.value = "2";
+    }
+
+    function handleAllotSubmit(e) {
+      e.preventDefault();
+      const empId = parseInt(document.getElementById("allot-emp-select").value, 10);
+      const roomNumber = document.getElementById("allot-room-select").value;
+      const bedNumber = parseInt(document.getElementById("allot-bed-select").value, 10);
+      const dateIn = document.getElementById("allot-date").value;
+
+      const emp = campEmployees.find(e => e.id === empId);
+      if (!emp) return;
+
+      emp.roomNumber = roomNumber;
+      emp.bedNumber = bedNumber;
+      emp.dateIn = dateIn;
+      emp.status = "ACTIVE";
+
+      persistState();
+      closeModal("modal-allot");
+      alert(`Bed Allotted successfully!\n${emp.name} ➔ Room ${roomNumber} (Bed ${bedNumber})`);
+    }
+
+    function openTransferModal(employeeId) {
+      const emp = campEmployees.find(e => e.id === employeeId);
+      if (!emp) return;
+
+      document.getElementById("trans-emp-id").value = emp.id;
+      document.getElementById("trans-emp-name").textContent = emp.name;
+      document.getElementById("trans-current-room").textContent = `Current: Room ${emp.roomNumber}, Bed ${emp.bedNumber}`;
+      handleTransferRoomChange();
+      openModal("modal-transfer");
+    }
+
+    function handleTransferRoomChange() {
+      const room = document.getElementById("trans-target-room").value;
+      const bedSelect = document.getElementById("trans-target-bed");
+      const occ = getOccupantsForRoom(room);
+      bedSelect.innerHTML = "";
+
+      const opt1 = document.createElement("option");
+      opt1.value = "1";
+      opt1.textContent = `Bed 1 ${occ.bed1 ? `(Occupied: ${occ.bed1.name})` : '(Vacant)'}`;
+      if (occ.bed1) opt1.disabled = true;
+      bedSelect.appendChild(opt1);
+
+      const opt2 = document.createElement("option");
+      opt2.value = "2";
+      opt2.textContent = `Bed 2 ${occ.bed2 ? `(Occupied: ${occ.bed2.name})` : '(Vacant)'}`;
+      if (occ.bed2) opt2.disabled = true;
+      bedSelect.appendChild(opt2);
+
+      if (!occ.bed1) bedSelect.value = "1";
+      else if (!occ.bed2) bedSelect.value = "2";
+    }
+
+    function handleTransferSubmit(e) {
+      e.preventDefault();
+      const empId = parseInt(document.getElementById("trans-emp-id").value, 10);
+      const newRoom = document.getElementById("trans-target-room").value;
+      const newBed = parseInt(document.getElementById("trans-target-bed").value, 10);
+
+      const emp = campEmployees.find(e => e.id === empId);
+      if (!emp) return;
+
+      const oldRoom = emp.roomNumber;
+      const oldBed = emp.bedNumber;
+
+      emp.roomNumber = newRoom;
+      emp.bedNumber = newBed;
+
+      persistState();
+      closeModal("modal-transfer");
+      alert(`Room Transfer Completed!\n${emp.name} moved from Room ${oldRoom} (Bed ${oldBed}) to Room ${newRoom} (Bed ${newBed}).`);
+    }
+
+    function checkOutEmployee(employeeId) {
+      const emp = campEmployees.find(e => e.id === employeeId);
+      if (!emp) return;
+
+      if (!confirm(`Are you sure you want to check out ${emp.name} from Room ${emp.roomNumber} (Bed ${emp.bedNumber})?\nThis will vacate the bed immediately.`)) {
+        return;
+      }
+
+      emp.roomNumber = "";
+      emp.bedNumber = null;
+      emp.status = "CHECKED_OUT";
+      emp.dateOut = new Date().toISOString().split("T")[0];
+
+      persistState();
+      alert(`${emp.name} has been checked out. The bed is now vacant and available.`);
+    }
+
+    function deleteEmployee(employeeId) {
+      const emp = campEmployees.find(e => e.id === employeeId);
+      if (!emp) return;
+
+      if (!confirm(`Are you sure you want to delete ${emp.name} from the roster?`)) return;
+
+      campEmployees = campEmployees.filter(e => e.id !== employeeId);
+      persistState();
+    }
+
+    function openQrModal() {
+      switchTab("qr");
+    }
+
+    function copyPortalLink() {
+      navigator.clipboard.writeText("https://awazelcamp.online/").then(() => {
+        alert("Copied https://awazelcamp.online/ to clipboard!");
+      }).catch(() => {
+        alert("Link: https://awazelcamp.online/");
+      });
+    }
+
+    // --- Bulk CSV Upload ---
+    function downloadSampleCsv() {
+      const csvContent = "data:text/csv;charset=utf-8," + 
+        "Name,Iqama,CardNo,Trade,Department,Company,Room,Bed\n" +
+        "Sami Al-Harbi,2491827364,CRD-101,Electrician,Maintenance,AWAZEL CO.,A-3,1\n" +
+        "Imran Khan,2489102837,CRD-102,Pipefitter,Production,AWAZEL CO.,A-3,2\n" +
+        "John Santos,2509182736,CRD-103,Forklift Driver,Logistics,AWAZEL CO.,A-4,1\n";
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "awazel_camp_employees_sample.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function handleCsvFile(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const text = evt.target.result;
+        const lines = text.split(/\r\n|\n/).filter(l => l.trim().length > 0);
+        if (lines.length <= 1) {
+          alert("CSV file is empty or missing data rows.");
+          return;
+        }
+
+        pendingCsvRows = [];
+        // Skip header
+        for (let i = 1; i < lines.length; i++) {
+          const cols = lines[i].split(",").map(c => c.trim().replace(/^"|"$/g, ""));
+          if (cols.length >= 2 && cols[0] && cols[1]) {
+            pendingCsvRows.push({
+              id: Date.now() + i,
+              name: cols[0],
+              iqamaNumber: cols[1],
+              cardNumber: cols[2] || `CRD-${i}`,
+              trade: cols[3] || "General Worker",
+              department: cols[4] || "Production",
+              company: cols[5] || "AWAZEL CO.",
+              roomNumber: cols[6] || "",
+              bedNumber: parseInt(cols[7], 10) || null,
+              dateIn: new Date().toISOString().split("T")[0],
+              status: "ACTIVE"
+            });
+          }
+        }
+
+        const previewContainer = document.getElementById("csv-preview-container");
+        const tbody = document.getElementById("csv-preview-body");
+        tbody.innerHTML = "";
+        document.getElementById("csv-count").textContent = pendingCsvRows.length;
+
+        pendingCsvRows.slice(0, 10).forEach(r => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${r.name}</td><td>${r.iqamaNumber}</td><td>${r.trade}</td><td>${r.department}</td><td>${r.roomNumber || 'None'}</td>`;
+          tbody.appendChild(tr);
+        });
+
+        previewContainer.style.display = "block";
+      };
+      reader.readAsText(file);
+    }
+
+    function cancelCsvImport() {
+      pendingCsvRows = [];
+      document.getElementById("csv-preview-container").style.display = "none";
+      document.getElementById("csv-file-input").value = "";
+    }
+
+    function commitCsvImport() {
+      if (pendingCsvRows.length === 0) return;
+      campEmployees.push(...pendingCsvRows);
+      persistState();
+      alert(`Successfully imported ${pendingCsvRows.length} employees to Awazel Camp Roster!`);
+      cancelCsvImport();
+      switchTab("employees");
+    }
+
+    // --- Boot Initializer ---
+    window.addEventListener("DOMContentLoaded", () => {
+      loadState();
+      // Set default registration date to today
+      const srDate = document.getElementById("sr-date");
+      if (srDate) srDate.value = new Date().toISOString().split("T")[0];
+    });
+  </script>
+</body>
+</html>

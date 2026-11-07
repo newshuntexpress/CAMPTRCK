@@ -30,9 +30,10 @@ import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.CorporateFare
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Security
-import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -363,7 +364,30 @@ fun SignInScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(6.dp))
+
+            // Open Web Portal directly in browser
+            TextButton(
+                onClick = {
+                    com.example.util.QrCodeGenerator.openWebPortalInBrowser(context, "https://awazelcamp.online/")
+                },
+                modifier = Modifier.testTag("login_open_web_portal_button")
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.OpenInNew,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(15.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = "Open Web Portal (awazelcamp.online)",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
 
             Text(
                 text = "AWAZEL CO. • Secure Cloud Camp Management",

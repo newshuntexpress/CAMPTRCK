@@ -36,6 +36,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MeetingRoom
 import androidx.compose.material.icons.filled.MoreVert
@@ -104,6 +105,7 @@ import com.example.ui.components.TransferDialog
 import com.example.ui.components.UserManagementDialog
 import com.example.ui.components.RegistrationQrDialog
 import com.example.ui.components.EmployeeSelfRegistrationDialog
+import com.example.ui.components.WebPortalDialog
 import com.example.ui.theme.Green500
 import com.example.ui.viewmodel.CampViewModel
 
@@ -215,11 +217,34 @@ fun DashboardScreen(
                             )
                         }
 
-                        // Daily Report & Allotment Quick Actions
+                        // Web Portal, Daily Report & Allotment Quick Actions
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
+                            // Web Portal Button (All Facilities)
+                            IconButton(
+                                onClick = { viewModel.openWebPortalDialog() },
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .testTag("top_bar_web_portal_button")
+                            ) {
+                                Surface(
+                                    shape = CircleShape,
+                                    color = MaterialTheme.colorScheme.tertiaryContainer,
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Icon(
+                                            imageVector = Icons.Default.Language,
+                                            contentDescription = "Web Portal (All Facilities)",
+                                            tint = MaterialTheme.colorScheme.onTertiaryContainer,
+                                            modifier = Modifier.size(17.dp)
+                                        )
+                                    }
+                                }
+                            }
+
                             // Daily Report Button
                             IconButton(
                                 onClick = { viewModel.openDailyReportDialog() },
@@ -829,14 +854,15 @@ fun DashboardScreen(
                     onAddNewRoomClick = { viewModel.openAddRoomDialog() },
                     onOpenReportClick = { viewModel.openDailyReportDialog() },
                     onOpenRegistrationQrClick = { viewModel.openRegistrationQrDialog() },
-                    onDownloadApkClick = { viewModel.startDownloadAndInstallApk(context) }
+                    onDownloadApkClick = { viewModel.openAppUpdateDialog() }
                 )
                 3 -> MoreActionsTab(
                     uiState = uiState,
                     onOpenReportClick = { viewModel.openDailyReportDialog() },
                     onOpenRegistrationQrClick = { viewModel.openRegistrationQrDialog() },
-                    onDownloadApkClick = { viewModel.startDownloadAndInstallApk(context) },
+                    onDownloadApkClick = { viewModel.openAppUpdateDialog() },
                     onAddNewRoomClick = { viewModel.openAddRoomDialog() },
+                    onOpenWebPortalClick = { viewModel.openWebPortalDialog() },
                     onUploadEmployees = { uri, onComplete ->
                         viewModel.bulkImportEmployees(context, uri, onComplete)
                     }
@@ -1092,6 +1118,14 @@ fun DashboardScreen(
                 viewModel.closeRegistrationQrDialog()
                 viewModel.openSelfRegistrationDialog()
             }
+        )
+    }
+
+    // --- In-App Web Portal Dialog (All Facilities) ---
+    if (uiState.showWebPortalDialog) {
+        WebPortalDialog(
+            onDismiss = { viewModel.closeWebPortalDialog() },
+            isOnline = uiState.isOnline
         )
     }
 

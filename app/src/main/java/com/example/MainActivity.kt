@@ -83,7 +83,7 @@ fun MainAppContent(initialDeepLink: Uri? = null) {
         mutableStateOf(
             initialDeepLink?.let { uri ->
                 (uri.scheme == "camptrack" && (uri.host == "register" || uri.path?.contains("register") == true)) ||
-                (uri.scheme == "https" && uri.host == "camptrack.awazel.com" && uri.path?.contains("register") == true)
+                (uri.scheme == "https" && (uri.host?.contains("awazelcamp.online") == true || uri.host?.contains("camptracawazel.online") == true || uri.host == "camptrack.awazel.com"))
             } ?: false
         )
     }
