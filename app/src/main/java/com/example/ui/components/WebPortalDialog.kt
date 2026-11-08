@@ -75,7 +75,7 @@ fun WebPortalDialog(
     var webViewInstance by remember { mutableStateOf<WebView?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     var loadProgress by remember { mutableIntStateOf(0) }
-    var currentTitle by remember { mutableStateOf("Awazel Camp Web Portal") }
+    var currentTitle by remember { mutableStateOf("Awazel Camp • Self-Registration Portal") }
     var canGoBack by remember { mutableStateOf(false) }
 
     Dialog(
@@ -345,7 +345,7 @@ fun WebPortalDialog(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Awazel Camp Web Portal • All Facilities Active",
+                            text = "Awazel Camp • Employee Self-Registration Portal",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 11.sp

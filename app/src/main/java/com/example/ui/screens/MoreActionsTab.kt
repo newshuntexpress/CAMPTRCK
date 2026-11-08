@@ -173,7 +173,7 @@ fun MoreActionsTab(
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
-                        Text("Open Web Portal (awazelcamp.online • All Facilities)", fontWeight = FontWeight.SemiBold)
+                        Text("Open Self-Registration Portal (awazelcamp.online)", fontWeight = FontWeight.SemiBold)
                     }
 
                     // 2. Upload Employees Button

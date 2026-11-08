@@ -237,7 +237,7 @@ fun DashboardScreen(
                                     Box(contentAlignment = Alignment.Center) {
                                         Icon(
                                             imageVector = Icons.Default.Language,
-                                            contentDescription = "Web Portal (All Facilities)",
+                                            contentDescription = "Employee Self-Registration Portal",
                                             tint = MaterialTheme.colorScheme.onTertiaryContainer,
                                             modifier = Modifier.size(17.dp)
                                         )

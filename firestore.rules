@@ -105,18 +105,18 @@ service cloud.firestore {
       allow delete: if (isAdmin() || (isSignedIn() && request.auth.uid == userId)) && isValidId(userId);
     }
 
-    // --- Camp Rooms Collection (ADMIN & SUPERVISOR CAN CREATE, EDIT, CHANGE, DELETE) ---
+    // --- Camp Rooms Collection (Readable publicly for live website room availability, Admin & Supervisor can manage) ---
     match /rooms/{roomId} {
-      allow get, list: if isSignedIn();
+      allow get, list: if true;
       allow create, update: if canManageCamp() && isValidId(roomId) && isValidRoom(incoming());
       allow delete: if canManageCamp() && isValidId(roomId);
     }
 
-    // --- Camp Employees Collection (ADMIN & SUPERVISOR CAN CREATE, EDIT, CHANGE, DELETE) ---
+    // --- Camp Employees Collection (Live bed status & employee self-registration from web, Admin & Supervisor manage) ---
     match /employees/{employeeId} {
-      allow get, list: if isSignedIn();
-      allow create, update: if canManageCamp() && isValidId(employeeId) && isValidEmployee(incoming());
-      allow delete: if canManageCamp() && isValidId(employeeId);
+      allow get, list: if true;
+      allow create: if (canManageCamp() || (incoming().isSelfRegistered == true && incoming().status == 'ACTIVE')) && isValidId(employeeId) && isValidEmployee(incoming());
+      allow update, delete: if canManageCamp() && isValidId(employeeId);
     }
 
     // --- System Updates & App Version Info (Readable by all signed in users, writable by Admin) ---
